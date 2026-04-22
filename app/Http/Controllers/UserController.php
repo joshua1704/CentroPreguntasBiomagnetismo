@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Hash;
 class UserController extends Controller
 {
     public function index() {
-        $sidebar = "Users";
+        $sidebar = "users";
         $users = DB::table('users')
             ->select('users.id', 'users.name', 'users.username', 'users.created_at')
             ->get();

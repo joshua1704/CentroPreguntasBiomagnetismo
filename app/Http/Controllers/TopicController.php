@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 class TopicController extends Controller
 {
     public function index() {
-        $sidebar = "Topics";
+        $sidebar = "topics";
         $topics = DB::table('topics')->get();
 
         return view('admin.pages.topics', compact('sidebar', 'topics'));

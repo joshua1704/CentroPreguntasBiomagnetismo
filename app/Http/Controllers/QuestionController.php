@@ -217,16 +217,16 @@ class QuestionController extends Controller
     private function sidebarView($sidebar) {
         $view = '';
         switch ($sidebar) {
-            case 'Pending':
+            case 'pending':
                 $view = 'admin.pages.pendingQuestions';
                 break;
-            case 'Answered':
+            case 'answered':
                 $view = 'admin.pages.answeredQuestions';
                 break;
-            case 'Published':
+            case 'published':
                 $view = 'admin.pages.publishedQuestions';
                 break;
-            case 'Archived':
+            case 'archived':
                 $view = 'admin.pages.archivedQuestions';
                 break;
             default:
@@ -239,16 +239,16 @@ class QuestionController extends Controller
     private function sidebarStatus($sidebar) {
         $status = '';
         switch ($sidebar) {
-            case 'Pending':
+            case 'pending':
                 $status = 1;
                 break;
-            case 'Answered':
+            case 'answered':
                 $status = 2;
                 break;
-            case 'Published':
+            case 'published':
                 $status = 3;
                 break;
-            case 'Archived':
+            case 'archived':
                 $status = 4;
                 break;
             default:

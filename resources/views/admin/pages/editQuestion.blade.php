@@ -8,7 +8,7 @@
                 </div>
                 <div class="col-4 text-end">
                     @php
-                        $route = route('admin_get_questions', 'Pending');
+                        $route = route('admin_get_questions', 'pending');
                     @endphp
                     @switch($sidebar)
                         @case('Pending')
@@ -18,22 +18,22 @@
                             @break
                         @case('Answered')
                             @php
-                                $route = route('admin_get_questions', 'Answered');
+                                $route = route('admin_get_questions', 'answered');
                             @endphp
                             @break
                         @case('Published')
                             @php
-                                $route = route('admin_get_questions', 'Published');
+                                $route = route('admin_get_questions', 'published');
                             @endphp
                             @break
                         @case('Archived')
                             @php
-                                $route = route('admin_get_questions', 'Archived');
+                                $route = route('admin_get_questions', 'archived');
                             @endphp
                             @break
                         @default
                             @php
-                                $route = route('admin_get_questions', 'Pending');
+                                $route = route('admin_get_questions', 'pending');
                             @endphp
                     @endswitch
                     <a href="{{ $route }}" class="btn btn-danger btn-sm">
