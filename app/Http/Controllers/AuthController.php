@@ -25,7 +25,7 @@ class AuthController extends Controller
                 return redirect('/admin/change_password');
             }
 
-            return route('admin_get_questions', 'Pending');
+            return redirect()->route('admin_get_questions', 'Pending');
         }
 
         return back()->withErrors([
