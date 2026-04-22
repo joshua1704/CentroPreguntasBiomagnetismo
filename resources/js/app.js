@@ -106,6 +106,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const response = await fetch('/admin/upload_image', {
                 method: 'POST',
+                credentials: 'same-origin',
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
