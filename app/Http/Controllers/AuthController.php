@@ -25,7 +25,7 @@ class AuthController extends Controller
                 return redirect('/change_password');
             }
 
-            return redirect('/dashboard');
+            return redirect('/preguntas/Pending');
         }
 
         return back()->withErrors([
