@@ -22,10 +22,10 @@ class AuthController extends Controller
             $request->session()->regenerate();
 
             if(auth()->user()->must_change_password) {
-                return redirect('/change_password');
+                return redirect('/admin/change_password');
             }
 
-            return redirect('/preguntas/Pending');
+            return view('admin_get_questions');
         }
 
         return back()->withErrors([
