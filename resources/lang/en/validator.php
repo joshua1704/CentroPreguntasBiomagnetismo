@@ -17,6 +17,6 @@ return [
     'topic_id_required' => '',
     'error_not_find_register' => '',
     'success_updated' => '',
-    'error_update_question' => ''
-
+    'error_update_question' => '',
+    'password_min' => ''
 ];

@@ -24,6 +24,7 @@ class UserController extends Controller
             'password' => [
                 'required',
                 'confirmed',
+                'min:8',
                 function($attribute, $value, $fail) {
                     // letters (al menos una letra)
                     if (!preg_match('/[a-zA-Z]/', $value)) {
@@ -52,7 +53,8 @@ class UserController extends Controller
             'username.required' => __('validator.username_required'),
             'username.unique' => __('validator.username_unique'),
             'password.required' => __('validator.password_required'),
-            'password.confirmed' => __('validator.password_confirmed')
+            'password.confirmed' => __('validator.password_confirmed'),
+            'password.min' => __('validator.password_min')
         ]);
 
         User::create([

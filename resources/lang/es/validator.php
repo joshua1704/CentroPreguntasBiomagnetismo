@@ -17,5 +17,6 @@ return [
     'topic_id_required' => 'El topic_id es obligatorio.',
     'error_not_find_register' => 'Registro no encontrado.',
     'success_updated' => 'Actualizado correctamente.',
-    'error_update_question' => 'Hubo un error inesperado al intentar actualizar la pregunta'
+    'error_update_question' => 'Hubo un error inesperado al intentar actualizar la pregunta',
+    'password_min' => 'La contraseña debe tener al menos 8 caracteres.'
 ];
