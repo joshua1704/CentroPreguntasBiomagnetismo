@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Nette\Utils;
 
-use function array_merge, checkdate, implode, is_numeric, is_string, preg_replace_callback, sprintf, time, trim;
+use Nette;
 
 
 /**
@@ -17,6 +17,8 @@ use function array_merge, checkdate, implode, is_numeric, is_string, preg_replac
  */
 class DateTime extends \DateTime implements \JsonSerializable
 {
+	use Nette\SmartObject;
+
 	/** minute in seconds */
 	public const MINUTE = 60;
 
@@ -30,27 +32,29 @@ class DateTime extends \DateTime implements \JsonSerializable
 	public const WEEK = 7 * self::DAY;
 
 	/** average month in seconds */
-	public const MONTH = 2_629_800;
+	public const MONTH = 2629800;
 
 	/** average year in seconds */
-	public const YEAR = 31_557_600;
+	public const YEAR = 31557600;
 
 
 	/**
 	 * Creates a DateTime object from a string, UNIX timestamp, or other DateTimeInterface object.
+	 * @param  string|int|\DateTimeInterface  $time
+	 * @return static
 	 * @throws \Exception if the date and time are not valid.
 	 */
-	public static function from(string|int|\DateTimeInterface|null $time): static
+	public static function from($time)
 	{
 		if ($time instanceof \DateTimeInterface) {
-			return static::createFromInterface($time);
+			return new static($time->format('Y-m-d H:i:s.u'), $time->getTimezone());
 
 		} elseif (is_numeric($time)) {
 			if ($time <= self::YEAR) {
 				$time += time();
 			}
 
-			return (new static)->setTimestamp((int) $time);
+			return (new static('@' . $time))->setTimezone(new \DateTimeZone(date_default_timezone_get()));
 
 		} else { // textual or null
 			return new static((string) $time);
@@ -60,7 +64,8 @@ class DateTime extends \DateTime implements \JsonSerializable
 
 	/**
 	 * Creates DateTime object.
-	 * @throws \Exception if the date and time are not valid.
+	 * @return static
+	 * @throws Nette\InvalidArgumentException if the date and time are not valid.
 	 */
 	public static function fromParts(
 		int $year,
@@ -68,105 +73,47 @@ class DateTime extends \DateTime implements \JsonSerializable
 		int $day,
 		int $hour = 0,
 		int $minute = 0,
-		float $second = 0.0,
-	): static
-	{
-		$sec = (int) floor($second);
-		return (new static(''))
-			->setDate($year, $month, $day)
-			->setTime($hour, $minute, $sec, (int) round(($second - $sec) * 1e6));
-	}
-
-
-	/**
-	 * Returns a new DateTime object formatted according to the specified format.
-	 */
-	public static function createFromFormat(
-		string $format,
-		string $datetime,
-		string|\DateTimeZone|null $timezone = null,
-	): static|false
-	{
-		if (is_string($timezone)) {
-			$timezone = new \DateTimeZone($timezone);
-		}
-
-		$date = parent::createFromFormat($format, $datetime, $timezone);
-		return $date ? static::from($date) : false;
-	}
-
-
-	public function __construct(string $datetime = 'now', ?\DateTimeZone $timezone = null)
-	{
-		$this->apply($datetime, $timezone, true);
-	}
-
-
-	public function modify(string $modifier): static
-	{
-		$this->apply($modifier);
-		return $this;
-	}
-
-
-	public function setDate(int $year, int $month, int $day): static
-	{
-		if (!checkdate($month, $day, $year)) {
-			throw new \Exception(sprintf('The date %04d-%02d-%02d is not valid.', $year, $month, $day));
-		}
-		return parent::setDate($year, $month, $day);
-	}
-
-
-	public function setTime(int $hour, int $minute, int $second = 0, int $microsecond = 0): static
-	{
+		float $second = 0.0
+	) {
+		$s = sprintf('%04d-%02d-%02d %02d:%02d:%02.5F', $year, $month, $day, $hour, $minute, $second);
 		if (
-			$hour < 0 || $hour > 23
-			|| $minute < 0 || $minute > 59
-			|| $second < 0 || $second >= 60
-			|| $microsecond < 0 || $microsecond >= 1_000_000
+			!checkdate($month, $day, $year)
+			|| $hour < 0
+			|| $hour > 23
+			|| $minute < 0
+			|| $minute > 59
+			|| $second < 0
+			|| $second >= 60
 		) {
-			throw new \Exception(sprintf('The time %02d:%02d:%08.5F is not valid.', $hour, $minute, $second + $microsecond / 1_000_000));
+			throw new Nette\InvalidArgumentException("Invalid date '$s'");
 		}
-		return parent::setTime($hour, $minute, $second, $microsecond);
+
+		return new static($s);
 	}
 
 
 	/**
-	 * Converts a relative time string (e.g. '10 minut') to seconds.
+	 * Returns new DateTime object formatted according to the specified format.
+	 * @param  string  $format  The format the $time parameter should be in
+	 * @param  string  $time
+	 * @param  string|\DateTimeZone  $timezone (default timezone is used if null is passed)
+	 * @return static|false
 	 */
-	public static function relativeToSeconds(string $relativeTime): int
+	#[\ReturnTypeWillChange]
+	public static function createFromFormat($format, $time, $timezone = null)
 	{
-		return (new self('@0 ' . $relativeTime))
-			->getTimestamp();
-	}
+		if ($timezone === null) {
+			$timezone = new \DateTimeZone(date_default_timezone_get());
 
+		} elseif (is_string($timezone)) {
+			$timezone = new \DateTimeZone($timezone);
 
-	private function apply(string $datetime, ?\DateTimeZone $timezone = null, bool $ctr = false): void
-	{
-		$relPart = '';
-		$absPart = preg_replace_callback(
-			'/[+-]?\s*\d+\s+((microsecond|millisecond|[mµu]sec)s?|[mµ]s|sec(ond)?s?|min(ute)?s?|hours?)(\s+ago)?\b/iu',
-			function ($m) use (&$relPart) {
-				$relPart .= $m[0] . ' ';
-				return '';
-			},
-			$datetime,
-		);
-
-		if ($ctr) {
-			parent::__construct($absPart, $timezone);
-			$this->handleErrors($datetime);
-		} elseif (trim($absPart)) {
-			parent::modify($absPart) && $this->handleErrors($datetime);
+		} elseif (!$timezone instanceof \DateTimeZone) {
+			throw new Nette\InvalidArgumentException('Invalid timezone given');
 		}
 
-		if ($relPart) {
-			$timezone ??= $this->getTimezone();
-			$this->setTimezone(new \DateTimeZone('UTC'));
-			parent::modify($relPart) && $this->handleErrors($datetime);
-			$this->setTimezone($timezone);
-		}
+		$date = parent::createFromFormat($format, $time, $timezone);
+		return $date ? static::from($date) : false;
 	}
 
 
@@ -189,21 +136,12 @@ class DateTime extends \DateTime implements \JsonSerializable
 
 
 	/**
-	 * You'd better use: (clone $dt)->modify(...)
+	 * Creates a copy with a modified time.
+	 * @return static
 	 */
-	public function modifyClone(string $modify = ''): static
+	public function modifyClone(string $modify = '')
 	{
 		$dolly = clone $this;
 		return $modify ? $dolly->modify($modify) : $dolly;
-	}
-
-
-	private function handleErrors(string $value): void
-	{
-		$errors = self::getLastErrors();
-		$errors = array_merge($errors['errors'] ?? [], $errors['warnings'] ?? []);
-		if ($errors) {
-			throw new \Exception(implode(', ', $errors) . " '$value'");
-		}
 	}
 }

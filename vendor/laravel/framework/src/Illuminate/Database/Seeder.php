@@ -3,9 +3,7 @@
 namespace Illuminate\Database;
 
 use Illuminate\Console\Command;
-use Illuminate\Console\View\Components\TwoColumnDetail;
-use Illuminate\Contracts\Container\Container;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Container\Container;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
 
@@ -14,7 +12,7 @@ abstract class Seeder
     /**
      * The container instance.
      *
-     * @var \Illuminate\Contracts\Container\Container
+     * @var \Illuminate\Container\Container
      */
     protected $container;
 
@@ -24,13 +22,6 @@ abstract class Seeder
      * @var \Illuminate\Console\Command
      */
     protected $command;
-
-    /**
-     * Seeders that have been called at least one time.
-     *
-     * @var array
-     */
-    protected static $called = [];
 
     /**
      * Run the given seeder class.
@@ -50,24 +41,18 @@ abstract class Seeder
             $name = get_class($seeder);
 
             if ($silent === false && isset($this->command)) {
-                (new TwoColumnDetail($this->command->getOutput()))
-                    ->render($name, '<fg=yellow;options=bold>RUNNING</>');
+                $this->command->getOutput()->writeln("<comment>Seeding:</comment> {$name}");
             }
 
             $startTime = microtime(true);
 
             $seeder->__invoke($parameters);
 
+            $runTime = number_format((microtime(true) - $startTime) * 1000, 2);
+
             if ($silent === false && isset($this->command)) {
-                $runTime = number_format((microtime(true) - $startTime) * 1000);
-
-                (new TwoColumnDetail($this->command->getOutput()))
-                    ->render($name, "<fg=gray>$runTime ms</> <fg=green;options=bold>DONE</>");
-
-                $this->command->getOutput()->writeln('');
+                $this->command->getOutput()->writeln("<info>Seeded:</info>  {$name} ({$runTime}ms)");
             }
-
-            static::$called[] = $class;
         }
 
         return $this;
@@ -98,26 +83,6 @@ abstract class Seeder
     }
 
     /**
-     * Run the given seeder class once.
-     *
-     * @param  array|string  $class
-     * @param  bool  $silent
-     * @return void
-     */
-    public function callOnce($class, $silent = false, array $parameters = [])
-    {
-        $classes = Arr::wrap($class);
-
-        foreach ($classes as $class) {
-            if (in_array($class, static::$called)) {
-                continue;
-            }
-
-            $this->call($class, $silent, $parameters);
-        }
-    }
-
-    /**
      * Resolve an instance of the given seeder class.
      *
      * @param  string  $class
@@ -143,7 +108,7 @@ abstract class Seeder
     /**
      * Set the IoC container instance.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @param  \Illuminate\Container\Container  $container
      * @return $this
      */
     public function setContainer(Container $container)
@@ -180,14 +145,8 @@ abstract class Seeder
             throw new InvalidArgumentException('Method [run] missing from '.get_class($this));
         }
 
-        $callback = fn () => isset($this->container)
-            ? $this->container->call([$this, 'run'], $parameters)
-            : $this->run(...$parameters);
-
-        if (isset(class_uses_recursive(static::class)[WithoutModelEvents::class])) {
-            $callback = $this->withoutModelEvents($callback);
-        }
-
-        return $callback();
+        return isset($this->container)
+                    ? $this->container->call([$this, 'run'], $parameters)
+                    : $this->run(...$parameters);
     }
 }

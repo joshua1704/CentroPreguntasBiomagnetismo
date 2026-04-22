@@ -4,9 +4,7 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider;
-use Symfony\Component\Console\Attribute\AsCommand;
 
-#[AsCommand(name: 'event:cache')]
 class EventCacheCommand extends Command
 {
     /**
@@ -26,18 +24,18 @@ class EventCacheCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return mixed
      */
     public function handle()
     {
-        $this->callSilent('event:clear');
+        $this->call('event:clear');
 
         file_put_contents(
             $this->laravel->getCachedEventsPath(),
             '<?php return '.var_export($this->getEvents(), true).';'
         );
 
-        $this->components->info('Events cached successfully.');
+        $this->info('Events cached successfully!');
     }
 
     /**

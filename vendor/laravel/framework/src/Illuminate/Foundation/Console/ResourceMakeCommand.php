@@ -3,10 +3,9 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
-use Symfony\Component\Console\Attribute\AsCommand;
+use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
 
-#[AsCommand(name: 'make:resource')]
 class ResourceMakeCommand extends GeneratorCommand
 {
     /**
@@ -51,11 +50,9 @@ class ResourceMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return match (true) {
-            $this->collection() => $this->resolveStubPath('/stubs/resource-collection.stub'),
-            $this->option('json-api') => $this->resolveStubPath('/stubs/resource-json-api.stub'),
-            default => $this->resolveStubPath('/stubs/resource.stub'),
-        };
+        return $this->collection()
+                    ? $this->resolveStubPath('/stubs/resource-collection.stub')
+                    : $this->resolveStubPath('/stubs/resource.stub');
     }
 
     /**
@@ -66,7 +63,7 @@ class ResourceMakeCommand extends GeneratorCommand
     protected function collection()
     {
         return $this->option('collection') ||
-               str_ends_with($this->argument('name'), 'Collection');
+               Str::endsWith($this->argument('name'), 'Collection');
     }
 
     /**
@@ -78,8 +75,8 @@ class ResourceMakeCommand extends GeneratorCommand
     protected function resolveStubPath($stub)
     {
         return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
-            ? $customPath
-            : __DIR__.$stub;
+                        ? $customPath
+                        : __DIR__.$stub;
     }
 
     /**
@@ -101,8 +98,6 @@ class ResourceMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
-            ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the resource already exists'],
-            ['json-api', 'j', InputOption::VALUE_NONE, 'Create a JSON:API resource'],
             ['collection', 'c', InputOption::VALUE_NONE, 'Create a resource collection'],
         ];
     }

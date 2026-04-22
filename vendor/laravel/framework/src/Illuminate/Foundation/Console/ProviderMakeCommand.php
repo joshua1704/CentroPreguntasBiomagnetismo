@@ -3,11 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
-use Illuminate\Support\ServiceProvider;
-use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Input\InputOption;
 
-#[AsCommand(name: 'make:provider')]
 class ProviderMakeCommand extends GeneratorCommand
 {
     /**
@@ -30,29 +26,6 @@ class ProviderMakeCommand extends GeneratorCommand
      * @var string
      */
     protected $type = 'Provider';
-
-    /**
-     * Execute the console command.
-     *
-     * @return bool|null
-     *
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
-     */
-    public function handle()
-    {
-        $result = parent::handle();
-
-        if ($result === false) {
-            return $result;
-        }
-
-        ServiceProvider::addProviderToBootstrapFile(
-            $this->qualifyClass($this->getNameInput()),
-            $this->laravel->getBootstrapProvidersPath(),
-        );
-
-        return $result;
-    }
 
     /**
      * Get the stub file for the generator.
@@ -86,17 +59,5 @@ class ProviderMakeCommand extends GeneratorCommand
     protected function getDefaultNamespace($rootNamespace)
     {
         return $rootNamespace.'\Providers';
-    }
-
-    /**
-     * Get the console command arguments.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the provider already exists'],
-        ];
     }
 }

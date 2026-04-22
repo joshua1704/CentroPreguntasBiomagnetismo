@@ -4,14 +4,10 @@ namespace Illuminate\Support;
 
 use ArrayIterator;
 use Illuminate\Contracts\Support\ValidatedData;
-use Illuminate\Support\Traits\Dumpable;
-use Illuminate\Support\Traits\InteractsWithData;
-use Traversable;
+use stdClass;
 
 class ValidatedInput implements ValidatedData
 {
-    use Dumpable, InteractsWithData;
-
     /**
      * The underlying input.
      *
@@ -23,10 +19,53 @@ class ValidatedInput implements ValidatedData
      * Create a new validated input container.
      *
      * @param  array  $input
+     * @return void
      */
     public function __construct(array $input)
     {
         $this->input = $input;
+    }
+
+    /**
+     * Get a subset containing the provided keys with values from the input data.
+     *
+     * @param  array|mixed  $keys
+     * @return array
+     */
+    public function only($keys)
+    {
+        $results = [];
+
+        $input = $this->input;
+
+        $placeholder = new stdClass;
+
+        foreach (is_array($keys) ? $keys : func_get_args() as $key) {
+            $value = data_get($input, $key, $placeholder);
+
+            if ($value !== $placeholder) {
+                Arr::set($results, $key, $value);
+            }
+        }
+
+        return $results;
+    }
+
+    /**
+     * Get all of the input except for a specified array of items.
+     *
+     * @param  array|mixed  $keys
+     * @return array
+     */
+    public function except($keys)
+    {
+        $keys = is_array($keys) ? $keys : func_get_args();
+
+        $results = $this->input;
+
+        Arr::forget($results, $keys);
+
+        return $results;
     }
 
     /**
@@ -37,91 +76,27 @@ class ValidatedInput implements ValidatedData
      */
     public function merge(array $items)
     {
-        return new static(array_merge($this->all(), $items));
+        return new static(array_merge($this->input, $items));
+    }
+
+    /**
+     * Get the input as a collection.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function collect()
+    {
+        return new Collection($this->input);
     }
 
     /**
      * Get the raw, underlying input array.
      *
-     * @param  mixed  $keys
      * @return array
      */
-    public function all($keys = null)
+    public function all()
     {
-        if (! $keys) {
-            return $this->input;
-        }
-
-        $input = [];
-
-        foreach (is_array($keys) ? $keys : func_get_args() as $key) {
-            Arr::set($input, $key, Arr::get($this->input, $key));
-        }
-
-        return $input;
-    }
-
-    /**
-     * Retrieve data from the instance.
-     *
-     * @param  string|null  $key
-     * @param  mixed  $default
-     * @return mixed
-     */
-    protected function data($key = null, $default = null)
-    {
-        return $this->input($key, $default);
-    }
-
-    /**
-     * Get the keys for all of the input.
-     *
-     * @return array
-     */
-    public function keys()
-    {
-        return array_keys($this->input());
-    }
-
-    /**
-     * Retrieve an input item from the validated inputs.
-     *
-     * @param  string|null  $key
-     * @param  mixed  $default
-     * @return mixed
-     */
-    public function input($key = null, $default = null)
-    {
-        return data_get(
-            $this->all(), $key, $default
-        );
-    }
-
-    /**
-     * Retrieve a file from the validated inputs.
-     *
-     * @param  string  $key
-     * @param  mixed  $default
-     * @return \Illuminate\Http\UploadedFile|null
-     */
-    public function file($key, $default = null)
-    {
-        $value = $this->input($key, $default);
-
-        return $value instanceof \Illuminate\Http\UploadedFile ? $value : $default;
-    }
-
-    /**
-     * Dump the items.
-     *
-     * @param  mixed  ...$keys
-     * @return $this
-     */
-    public function dump(...$keys)
-    {
-        dump(count($keys) > 0 ? $this->only($keys) : $this->all());
-
-        return $this;
+        return $this->input;
     }
 
     /**
@@ -142,7 +117,7 @@ class ValidatedInput implements ValidatedData
      */
     public function __get($name)
     {
-        return $this->input($name);
+        return $this->input[$name];
     }
 
     /**
@@ -158,18 +133,17 @@ class ValidatedInput implements ValidatedData
     }
 
     /**
-     * Determine if an input item is set.
+     * Determine if an input key is set.
      *
-     * @param  string  $name
      * @return bool
      */
     public function __isset($name)
     {
-        return $this->exists($name);
+        return isset($this->input[$name]);
     }
 
     /**
-     * Remove an input item.
+     * Remove an input key.
      *
      * @param  string  $name
      * @return void
@@ -185,9 +159,10 @@ class ValidatedInput implements ValidatedData
      * @param  mixed  $key
      * @return bool
      */
-    public function offsetExists($key): bool
+    #[\ReturnTypeWillChange]
+    public function offsetExists($key)
     {
-        return $this->exists($key);
+        return isset($this->input[$key]);
     }
 
     /**
@@ -196,9 +171,10 @@ class ValidatedInput implements ValidatedData
      * @param  mixed  $key
      * @return mixed
      */
-    public function offsetGet($key): mixed
+    #[\ReturnTypeWillChange]
+    public function offsetGet($key)
     {
-        return $this->input($key);
+        return $this->input[$key];
     }
 
     /**
@@ -208,7 +184,8 @@ class ValidatedInput implements ValidatedData
      * @param  mixed  $value
      * @return void
      */
-    public function offsetSet($key, $value): void
+    #[\ReturnTypeWillChange]
+    public function offsetSet($key, $value)
     {
         if (is_null($key)) {
             $this->input[] = $value;
@@ -223,7 +200,8 @@ class ValidatedInput implements ValidatedData
      * @param  string  $key
      * @return void
      */
-    public function offsetUnset($key): void
+    #[\ReturnTypeWillChange]
+    public function offsetUnset($key)
     {
         unset($this->input[$key]);
     }
@@ -233,7 +211,8 @@ class ValidatedInput implements ValidatedData
      *
      * @return \ArrayIterator
      */
-    public function getIterator(): Traversable
+    #[\ReturnTypeWillChange]
+    public function getIterator()
     {
         return new ArrayIterator($this->input);
     }

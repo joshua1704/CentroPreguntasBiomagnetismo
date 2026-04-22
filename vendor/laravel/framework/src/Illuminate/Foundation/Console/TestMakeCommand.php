@@ -4,14 +4,8 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Str;
-use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 
-use function Laravel\Prompts\select;
-
-#[AsCommand(name: 'make:test')]
 class TestMakeCommand extends GeneratorCommand
 {
     /**
@@ -44,7 +38,7 @@ class TestMakeCommand extends GeneratorCommand
     {
         $suffix = $this->option('unit') ? '.unit.stub' : '.stub';
 
-        return $this->usingPest()
+        return $this->option('pest')
             ? $this->resolveStubPath('/stubs/pest'.$suffix)
             : $this->resolveStubPath('/stubs/test'.$suffix);
     }
@@ -58,8 +52,8 @@ class TestMakeCommand extends GeneratorCommand
     protected function resolveStubPath($stub)
     {
         return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
-            ? $customPath
-            : __DIR__.$stub;
+                        ? $customPath
+                        : __DIR__.$stub;
     }
 
     /**
@@ -108,50 +102,8 @@ class TestMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
-            ['force', 'f', InputOption::VALUE_NONE, 'Create the test even if the test already exists'],
-            ['unit', 'u', InputOption::VALUE_NONE, 'Create a unit test'],
-            ['pest', null, InputOption::VALUE_NONE, 'Create a Pest test'],
-            ['phpunit', null, InputOption::VALUE_NONE, 'Create a PHPUnit test'],
+            ['unit', 'u', InputOption::VALUE_NONE, 'Create a unit test.'],
+            ['pest', 'p', InputOption::VALUE_NONE, 'Create a Pest test.'],
         ];
-    }
-
-    /**
-     * Interact further with the user if they were prompted for missing arguments.
-     *
-     * @param  \Symfony\Component\Console\Input\InputInterface  $input
-     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-     * @return void
-     */
-    protected function afterPromptingForMissingArguments(InputInterface $input, OutputInterface $output)
-    {
-        if ($this->isReservedName($this->getNameInput()) || $this->didReceiveOptions($input)) {
-            return;
-        }
-
-        $type = select('Which type of test would you like?', [
-            'feature' => 'Feature',
-            'unit' => 'Unit',
-        ]);
-
-        match ($type) {
-            'feature' => null,
-            'unit' => $input->setOption('unit', true),
-        };
-    }
-
-    /**
-     * Determine if Pest is being used by the application.
-     *
-     * @return bool
-     */
-    protected function usingPest()
-    {
-        if ($this->option('phpunit')) {
-            return false;
-        }
-
-        return $this->option('pest') ||
-            (function_exists('\Pest\\version') &&
-             file_exists(base_path('tests').'/Pest.php'));
     }
 }

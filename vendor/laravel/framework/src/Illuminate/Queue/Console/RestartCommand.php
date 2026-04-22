@@ -5,9 +5,7 @@ namespace Illuminate\Queue\Console;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Support\InteractsWithTime;
-use Symfony\Component\Console\Attribute\AsCommand;
 
-#[AsCommand(name: 'queue:restart')]
 class RestartCommand extends Command
 {
     use InteractsWithTime;
@@ -37,6 +35,7 @@ class RestartCommand extends Command
      * Create a new queue restart command.
      *
      * @param  \Illuminate\Contracts\Cache\Repository  $cache
+     * @return void
      */
     public function __construct(Cache $cache)
     {
@@ -54,6 +53,6 @@ class RestartCommand extends Command
     {
         $this->cache->forever('illuminate:queue:restart', $this->currentTime());
 
-        $this->components->info('Broadcasting queue restart signal.');
+        $this->info('Broadcasting queue restart signal.');
     }
 }

@@ -20,6 +20,7 @@ class NullDispatcher implements DispatcherContract
      * Create a new event dispatcher instance that does not fire.
      *
      * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
+     * @return void
      */
     public function __construct(DispatcherContract $dispatcher)
     {
@@ -56,7 +57,7 @@ class NullDispatcher implements DispatcherContract
      *
      * @param  string|object  $event
      * @param  mixed  $payload
-     * @return mixed
+     * @return array|null
      */
     public function until($event, $payload = [])
     {
@@ -138,6 +139,6 @@ class NullDispatcher implements DispatcherContract
      */
     public function __call($method, $parameters)
     {
-        return $this->forwardDecoratedCallTo($this->dispatcher, $method, $parameters);
+        return $this->forwardCallTo($this->dispatcher, $method, $parameters);
     }
 }

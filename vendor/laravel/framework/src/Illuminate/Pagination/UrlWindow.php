@@ -17,6 +17,7 @@ class UrlWindow
      * Create a new URL window instance.
      *
      * @param  \Illuminate\Contracts\Pagination\LengthAwarePaginator  $paginator
+     * @return void
      */
     public function __construct(PaginatorContract $paginator)
     {
@@ -99,7 +100,7 @@ class UrlWindow
     }
 
     /**
-     * Get the slider of URLs when too close to the beginning of the window.
+     * Get the slider of URLs when too close to beginning of window.
      *
      * @param  int  $window
      * @param  int  $onEachSide
@@ -115,7 +116,7 @@ class UrlWindow
     }
 
     /**
-     * Get the slider of URLs when too close to the ending of the window.
+     * Get the slider of URLs when too close to ending of window.
      *
      * @param  int  $window
      * @param  int  $onEachSide

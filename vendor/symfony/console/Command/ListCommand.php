@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Console\Command;
 
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Descriptor\ApplicationDescription;
 use Symfony\Component\Console\Helper\DescriptorHelper;
 use Symfony\Component\Console\Input\InputArgument;
@@ -25,39 +27,45 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ListCommand extends Command
 {
-    protected function configure(): void
+    /**
+     * {@inheritdoc}
+     */
+    protected function configure()
     {
         $this
             ->setName('list')
             ->setDefinition([
-                new InputArgument('namespace', InputArgument::OPTIONAL, 'The namespace name', null, fn () => array_keys((new ApplicationDescription($this->getApplication()))->getNamespaces())),
+                new InputArgument('namespace', InputArgument::OPTIONAL, 'The namespace name'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw command list'),
-                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)', 'txt', fn () => (new DescriptorHelper())->getFormats()),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)', 'txt'),
                 new InputOption('short', null, InputOption::VALUE_NONE, 'To skip describing commands\' arguments'),
             ])
             ->setDescription('List commands')
             ->setHelp(<<<'EOF'
-                The <info>%command.name%</info> command lists all commands:
+The <info>%command.name%</info> command lists all commands:
 
-                  <info>%command.full_name%</info>
+  <info>%command.full_name%</info>
 
-                You can also display the commands for a specific namespace:
+You can also display the commands for a specific namespace:
 
-                  <info>%command.full_name% test</info>
+  <info>%command.full_name% test</info>
 
-                You can also output the information in other formats by using the <info>--format</info> option:
+You can also output the information in other formats by using the <comment>--format</comment> option:
 
-                  <info>%command.full_name% --format=xml</info>
+  <info>%command.full_name% --format=xml</info>
 
-                It's also possible to get raw list of commands (useful for embedding command runner):
+It's also possible to get raw list of commands (useful for embedding command runner):
 
-                  <info>%command.full_name% --raw</info>
-                EOF
+  <info>%command.full_name% --raw</info>
+EOF
             )
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    /**
+     * {@inheritdoc}
+     */
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         $helper = new DescriptorHelper();
         $helper->describe($output, $this->getApplication(), [
@@ -68,5 +76,20 @@ class ListCommand extends Command
         ]);
 
         return 0;
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestArgumentValuesFor('namespace')) {
+            $descriptor = new ApplicationDescription($this->getApplication());
+            $suggestions->suggestValues(array_keys($descriptor->getNamespaces()));
+
+            return;
+        }
+
+        if ($input->mustSuggestOptionValuesFor('format')) {
+            $helper = new DescriptorHelper();
+            $suggestions->suggestValues($helper->getFormats());
+        }
     }
 }

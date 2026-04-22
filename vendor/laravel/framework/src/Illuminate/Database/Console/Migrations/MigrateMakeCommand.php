@@ -2,14 +2,11 @@
 
 namespace Illuminate\Database\Console\Migrations;
 
-use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Database\Migrations\MigrationCreator;
 use Illuminate\Support\Composer;
 use Illuminate\Support\Str;
-use Symfony\Component\Console\Attribute\AsCommand;
 
-#[AsCommand(name: 'make:migration')]
-class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
+class MigrateMakeCommand extends BaseCommand
 {
     /**
      * The console command signature.
@@ -21,7 +18,7 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
         {--table= : The table to migrate}
         {--path= : The location where the migration file should be created}
         {--realpath : Indicate any provided migration file paths are pre-resolved absolute paths}
-        {--fullpath : Output the full path of the migration (Deprecated)}';
+        {--fullpath : Output the full path of the migration}';
 
     /**
      * The console command description.
@@ -41,8 +38,6 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
      * The Composer instance.
      *
      * @var \Illuminate\Support\Composer
-     *
-     * @deprecated Will be removed in a future Laravel version.
      */
     protected $composer;
 
@@ -51,6 +46,7 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
      *
      * @param  \Illuminate\Database\Migrations\MigrationCreator  $creator
      * @param  \Illuminate\Support\Composer  $composer
+     * @return void
      */
     public function __construct(MigrationCreator $creator, Composer $composer)
     {
@@ -96,6 +92,8 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
         // the migration out, we will dump-autoload for the entire framework to
         // make sure that the migrations are registered by the class loaders.
         $this->writeMigration($name, $table, $create);
+
+        $this->composer->dumpAutoloads();
     }
 
     /**
@@ -104,7 +102,7 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
      * @param  string  $name
      * @param  string  $table
      * @param  bool  $create
-     * @return void
+     * @return string
      */
     protected function writeMigration($name, $table, $create)
     {
@@ -112,11 +110,11 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
             $name, $this->getMigrationPath(), $table, $create
         );
 
-        if (windows_os()) {
-            $file = str_replace('/', '\\', $file);
+        if (! $this->option('fullpath')) {
+            $file = pathinfo($file, PATHINFO_FILENAME);
         }
 
-        $this->components->info(sprintf('Migration [%s] created successfully.', $file));
+        $this->line("<info>Created Migration:</info> {$file}");
     }
 
     /**
@@ -128,22 +126,10 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
     {
         if (! is_null($targetPath = $this->input->getOption('path'))) {
             return ! $this->usingRealPath()
-                ? $this->laravel->basePath().'/'.$targetPath
-                : $targetPath;
+                            ? $this->laravel->basePath().'/'.$targetPath
+                            : $targetPath;
         }
 
         return parent::getMigrationPath();
-    }
-
-    /**
-     * Prompt for missing input arguments using the returned questions.
-     *
-     * @return array
-     */
-    protected function promptForMissingArgumentsUsing()
-    {
-        return [
-            'name' => ['What should the migration be named?', 'E.g. create_flights_table'],
-        ];
     }
 }

@@ -19,13 +19,6 @@ class Attribute
     public $set;
 
     /**
-     * Indicates if caching is enabled for this attribute.
-     *
-     * @var bool
-     */
-    public $withCaching = false;
-
-    /**
      * Indicates if caching of objects is enabled for this attribute.
      *
      * @var bool
@@ -37,23 +30,12 @@ class Attribute
      *
      * @param  callable|null  $get
      * @param  callable|null  $set
+     * @return void
      */
-    public function __construct(?callable $get = null, ?callable $set = null)
+    public function __construct(callable $get = null, callable $set = null)
     {
         $this->get = $get;
         $this->set = $set;
-    }
-
-    /**
-     * Create a new attribute accessor / mutator.
-     *
-     * @param  callable|null  $get
-     * @param  callable|null  $set
-     * @return static
-     */
-    public static function make(?callable $get = null, ?callable $set = null): static
-    {
-        return new static($get, $set);
     }
 
     /**
@@ -86,18 +68,6 @@ class Attribute
     public function withoutObjectCaching()
     {
         $this->withObjectCaching = false;
-
-        return $this;
-    }
-
-    /**
-     * Enable caching for the attribute.
-     *
-     * @return static
-     */
-    public function shouldCache()
-    {
-        $this->withCaching = true;
 
         return $this;
     }

@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
 
 /**
  * This file is part of the Nette Framework (https://nette.org)
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
+
+declare(strict_types=1);
 
 namespace Nette\Schema;
 
@@ -15,13 +17,19 @@ use Nette;
  */
 final class Processor
 {
-	/** @var list<\Closure(Context): void> */
-	public array $onNewContext = [];
-	private Context $context;
-	private bool $skipDefaults = false;
+	use Nette\SmartObject;
+
+	/** @var array */
+	public $onNewContext = [];
+
+	/** @var Context|null */
+	private $context;
+
+	/** @var bool */
+	private $skipDefaults;
 
 
-	public function skipDefaults(bool $value = true): void
+	public function skipDefaults(bool $value = true)
 	{
 		$this->skipDefaults = $value;
 	}
@@ -29,9 +37,10 @@ final class Processor
 
 	/**
 	 * Normalizes and validates data. Result is a clean completed data.
+	 * @return mixed
 	 * @throws ValidationException
 	 */
-	public function process(Schema $schema, mixed $data): mixed
+	public function process(Schema $schema, $data)
 	{
 		$this->createContext();
 		$data = $schema->normalize($data, $this->context);
@@ -44,10 +53,10 @@ final class Processor
 
 	/**
 	 * Normalizes and validates and merges multiple data. Result is a clean completed data.
-	 * @param  list<mixed>  $dataset
+	 * @return mixed
 	 * @throws ValidationException
 	 */
-	public function processMultiple(Schema $schema, array $dataset): mixed
+	public function processMultiple(Schema $schema, array $dataset)
 	{
 		$this->createContext();
 		$flatten = null;
@@ -65,7 +74,9 @@ final class Processor
 	}
 
 
-	/** @return list<string> */
+	/**
+	 * @return string[]
+	 */
 	public function getWarnings(): array
 	{
 		$res = [];
@@ -85,10 +96,10 @@ final class Processor
 	}
 
 
-	private function createContext(): void
+	private function createContext()
 	{
 		$this->context = new Context;
 		$this->context->skipDefaults = $this->skipDefaults;
-		Nette\Utils\Arrays::invoke($this->onNewContext, $this->context);
+		$this->onNewContext($this->context);
 	}
 }

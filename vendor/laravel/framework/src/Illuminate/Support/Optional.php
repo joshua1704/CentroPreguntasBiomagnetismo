@@ -23,6 +23,7 @@ class Optional implements ArrayAccess
      * Create a new optional instance.
      *
      * @param  mixed  $value
+     * @return void
      */
     public function __construct($value)
     {
@@ -64,49 +65,53 @@ class Optional implements ArrayAccess
     /**
      * Determine if an item exists at an offset.
      *
-     * @param  mixed  $offset
+     * @param  mixed  $key
      * @return bool
      */
-    public function offsetExists($offset): bool
+    #[\ReturnTypeWillChange]
+    public function offsetExists($key)
     {
-        return Arr::accessible($this->value) && Arr::exists($this->value, $offset);
+        return Arr::accessible($this->value) && Arr::exists($this->value, $key);
     }
 
     /**
      * Get an item at a given offset.
      *
-     * @param  mixed  $offset
+     * @param  mixed  $key
      * @return mixed
      */
-    public function offsetGet($offset): mixed
+    #[\ReturnTypeWillChange]
+    public function offsetGet($key)
     {
-        return Arr::get($this->value, $offset);
+        return Arr::get($this->value, $key);
     }
 
     /**
      * Set the item at a given offset.
      *
-     * @param  mixed  $offset
+     * @param  mixed  $key
      * @param  mixed  $value
      * @return void
      */
-    public function offsetSet($offset, $value): void
+    #[\ReturnTypeWillChange]
+    public function offsetSet($key, $value)
     {
         if (Arr::accessible($this->value)) {
-            $this->value[$offset] = $value;
+            $this->value[$key] = $value;
         }
     }
 
     /**
      * Unset the item at a given offset.
      *
-     * @param  string  $offset
+     * @param  string  $key
      * @return void
      */
-    public function offsetUnset($offset): void
+    #[\ReturnTypeWillChange]
+    public function offsetUnset($key)
     {
         if (Arr::accessible($this->value)) {
-            unset($this->value[$offset]);
+            unset($this->value[$key]);
         }
     }
 

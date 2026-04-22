@@ -3,7 +3,6 @@
 namespace Illuminate\Validation\Concerns;
 
 use Egulias\EmailValidator\EmailLexer;
-use Egulias\EmailValidator\Result\InvalidEmail;
 use Egulias\EmailValidator\Validation\EmailValidation;
 
 class FilterEmailValidation implements EmailValidation
@@ -18,7 +17,8 @@ class FilterEmailValidation implements EmailValidation
     /**
      * Create a new validation instance.
      *
-     * @param  int|null  $flags
+     * @param  int  $flags
+     * @return void
      */
     public function __construct($flags = null)
     {
@@ -42,21 +42,21 @@ class FilterEmailValidation implements EmailValidation
      * @param  \Egulias\EmailValidator\EmailLexer  $emailLexer
      * @return bool
      */
-    public function isValid(string $email, EmailLexer $emailLexer): bool
+    public function isValid($email, EmailLexer $emailLexer)
     {
         return is_null($this->flags)
-            ? filter_var($email, FILTER_VALIDATE_EMAIL) !== false
-            : filter_var($email, FILTER_VALIDATE_EMAIL, $this->flags) !== false;
+                    ? filter_var($email, FILTER_VALIDATE_EMAIL) !== false
+                    : filter_var($email, FILTER_VALIDATE_EMAIL, $this->flags) !== false;
     }
 
     /**
      * Returns the validation error.
      *
-     * @return \Egulias\EmailValidator\Result\InvalidEmail|null
+     * @return \Egulias\EmailValidator\Exception\InvalidEmail|null
      */
-    public function getError(): ?InvalidEmail
+    public function getError()
     {
-        return null;
+        //
     }
 
     /**
@@ -64,7 +64,7 @@ class FilterEmailValidation implements EmailValidation
      *
      * @return \Egulias\EmailValidator\Warning\Warning[]
      */
-    public function getWarnings(): array
+    public function getWarnings()
     {
         return [];
     }

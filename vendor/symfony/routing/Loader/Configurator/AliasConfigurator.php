@@ -16,9 +16,11 @@ use Symfony\Component\Routing\Alias;
 
 class AliasConfigurator
 {
-    public function __construct(
-        private Alias $alias,
-    ) {
+    private $alias;
+
+    public function __construct(Alias $alias)
+    {
+        $this->alias = $alias;
     }
 
     /**
@@ -32,7 +34,7 @@ class AliasConfigurator
      *
      * @throws InvalidArgumentException when the message template is invalid
      */
-    public function deprecate(string $package, string $version, string $message): static
+    public function deprecate(string $package, string $version, string $message): self
     {
         $this->alias->setDeprecated($package, $version, $message);
 

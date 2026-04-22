@@ -2,61 +2,30 @@
 
 namespace Illuminate\Database\Eloquent\Factories;
 
-use Illuminate\Database\Eloquent\Attributes\UseFactory;
-
-/**
- * @template TFactory of \Illuminate\Database\Eloquent\Factories\Factory
- */
 trait HasFactory
 {
     /**
      * Get a new factory instance for the model.
      *
-     * @param  (callable(array<string, mixed>, static|null): array<string, mixed>)|array<string, mixed>|int|null  $count
-     * @param  (callable(array<string, mixed>, static|null): array<string, mixed>)|array<string, mixed>  $state
-     * @return TFactory
+     * @param  mixed  $parameters
+     * @return \Illuminate\Database\Eloquent\Factories\Factory
      */
-    public static function factory($count = null, $state = [])
+    public static function factory(...$parameters)
     {
-        $factory = static::newFactory() ?? Factory::factoryForModel(static::class);
+        $factory = static::newFactory() ?: Factory::factoryForModel(get_called_class());
 
         return $factory
-            ->count(is_numeric($count) ? $count : null)
-            ->state(is_callable($count) || is_array($count) ? $count : $state);
+                    ->count(is_numeric($parameters[0] ?? null) ? $parameters[0] : null)
+                    ->state(is_array($parameters[0] ?? null) ? $parameters[0] : ($parameters[1] ?? []));
     }
 
     /**
      * Create a new factory instance for the model.
      *
-     * @return TFactory|null
+     * @return \Illuminate\Database\Eloquent\Factories\Factory
      */
     protected static function newFactory()
     {
-        if (isset(static::$factory)) {
-            return static::$factory::new();
-        }
-
-        return static::getUseFactoryAttribute() ?? null;
-    }
-
-    /**
-     * Get the factory from the UseFactory class attribute.
-     *
-     * @return TFactory|null
-     */
-    protected static function getUseFactoryAttribute()
-    {
-        $attributes = (new \ReflectionClass(static::class))
-            ->getAttributes(UseFactory::class);
-
-        if ($attributes !== []) {
-            $useFactory = $attributes[0]->newInstance();
-
-            $factory = $useFactory->factoryClass::new();
-
-            $factory->guessModelNamesUsing(fn () => static::class);
-
-            return $factory;
-        }
+        //
     }
 }

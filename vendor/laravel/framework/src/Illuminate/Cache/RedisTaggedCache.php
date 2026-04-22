@@ -2,69 +2,37 @@
 
 namespace Illuminate\Cache;
 
-use Illuminate\Cache\Events\CacheFlushed;
-use Illuminate\Cache\Events\CacheFlushing;
-use Illuminate\Redis\Connections\PhpRedisClusterConnection;
-use Illuminate\Redis\Connections\PhpRedisConnection;
-use Illuminate\Redis\Connections\PredisClusterConnection;
-use Illuminate\Redis\Connections\PredisConnection;
-
-use function Illuminate\Support\enum_value;
-
 class RedisTaggedCache extends TaggedCache
 {
     /**
-     * Store an item in the cache if the key does not exist.
+     * Forever reference key.
      *
-     * @param  \UnitEnum|string  $key
-     * @param  mixed  $value
-     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
-     * @return bool
+     * @var string
      */
-    public function add($key, $value, $ttl = null)
-    {
-        $key = enum_value($key);
+    const REFERENCE_KEY_FOREVER = 'forever_ref';
 
-        $seconds = null;
-
-        if ($ttl !== null) {
-            $seconds = $this->getSeconds($ttl);
-
-            if ($seconds > 0) {
-                $this->tags->addEntry(
-                    $this->itemKey($key),
-                    $seconds
-                );
-            }
-        }
-
-        return parent::add($key, $value, $ttl);
-    }
+    /**
+     * Standard reference key.
+     *
+     * @var string
+     */
+    const REFERENCE_KEY_STANDARD = 'standard_ref';
 
     /**
      * Store an item in the cache.
      *
-     * @param  \UnitEnum|string  $key
+     * @param  string  $key
      * @param  mixed  $value
      * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      * @return bool
      */
     public function put($key, $value, $ttl = null)
     {
-        $key = enum_value($key);
-
-        if (is_null($ttl)) {
+        if ($ttl === null) {
             return $this->forever($key, $value);
         }
 
-        $seconds = $this->getSeconds($ttl);
-
-        if ($seconds > 0) {
-            $this->tags->addEntry(
-                $this->itemKey($key),
-                $seconds
-            );
-        }
+        $this->pushStandardKeys($this->tags->getNamespace(), $key);
 
         return parent::put($key, $value, $ttl);
     }
@@ -72,15 +40,13 @@ class RedisTaggedCache extends TaggedCache
     /**
      * Increment the value of an item in the cache.
      *
-     * @param  \UnitEnum|string  $key
+     * @param  string  $key
      * @param  mixed  $value
      * @return int|bool
      */
     public function increment($key, $value = 1)
     {
-        $key = enum_value($key);
-
-        $this->tags->addEntry($this->itemKey($key), updateWhen: 'NX');
+        $this->pushStandardKeys($this->tags->getNamespace(), $key);
 
         return parent::increment($key, $value);
     }
@@ -88,13 +54,13 @@ class RedisTaggedCache extends TaggedCache
     /**
      * Decrement the value of an item in the cache.
      *
-     * @param  \UnitEnum|string  $key
+     * @param  string  $key
      * @param  mixed  $value
      * @return int|bool
      */
     public function decrement($key, $value = 1)
     {
-        $this->tags->addEntry($this->itemKey($key), updateWhen: 'NX');
+        $this->pushStandardKeys($this->tags->getNamespace(), $key);
 
         return parent::decrement($key, $value);
     }
@@ -102,15 +68,13 @@ class RedisTaggedCache extends TaggedCache
     /**
      * Store an item in the cache indefinitely.
      *
-     * @param  \UnitEnum|string  $key
+     * @param  string  $key
      * @param  mixed  $value
      * @return bool
      */
     public function forever($key, $value)
     {
-        $key = enum_value($key);
-
-        $this->tags->addEntry($this->itemKey($key));
+        $this->pushForeverKeys($this->tags->getNamespace(), $key);
 
         return parent::forever($key, $value);
     }
@@ -122,111 +86,129 @@ class RedisTaggedCache extends TaggedCache
      */
     public function flush()
     {
-        $connection = $this->store->connection();
+        $this->deleteForeverKeys();
+        $this->deleteStandardKeys();
 
-        if ($connection instanceof PredisClusterConnection ||
-            $connection instanceof PhpRedisClusterConnection) {
-            return $this->flushClusteredConnection();
-        }
-
-        $this->event(new CacheFlushing($this->getName()));
-
-        $redisPrefix = match (true) {
-            $connection instanceof PhpRedisConnection => $connection->client()->getOption(\Redis::OPT_PREFIX),
-            $connection instanceof PredisConnection => $connection->client()->getOptions()->prefix,
-        };
-
-        $cachePrefix = $redisPrefix.$this->store->getPrefix();
-
-        $cacheTags = [];
-
-        foreach ($this->tags->getNames() as $name) {
-            $cacheTags[] = $cachePrefix.$this->tags->tagId($name);
-        }
-
-        $script = <<<'LUA'
-            local prefix = table.remove(ARGV, 1)
-
-            for i, key in ipairs(KEYS) do
-                redis.call('DEL', key)
-
-                for j, arg in ipairs(ARGV) do
-                    local zkey = string.gsub(key, prefix, "")
-                    redis.call('ZREM', arg, zkey)
-                end
-            end
-        LUA;
-
-        $entries = $this->tags->entries()
-            ->map(fn (string $key) => $this->store->getPrefix().$key)
-            ->chunk(1000);
-
-        foreach ($entries as $keysToBeDeleted) {
-            $connection->eval(
-                $script,
-                count($keysToBeDeleted),
-                ...$keysToBeDeleted,
-                ...[str_replace('-', '%-', $cachePrefix), ...$cacheTags]
-            );
-        }
-
-        $this->event(new CacheFlushed($this->getName()));
-
-        return true;
-    }
-
-    /**
-     * Remove all items from the cache.
-     *
-     * @return bool
-     */
-    protected function flushClusteredConnection()
-    {
-        $this->event(new CacheFlushing($this->getName()));
-
-        $this->flushValues();
         $this->tags->flush();
 
-        $this->event(new CacheFlushed($this->getName()));
-
         return true;
     }
 
     /**
-     * Flush the individual cache entries for the tags.
+     * Store standard key references into store.
+     *
+     * @param  string  $namespace
+     * @param  string  $key
+     * @return void
+     */
+    protected function pushStandardKeys($namespace, $key)
+    {
+        $this->pushKeys($namespace, $key, self::REFERENCE_KEY_STANDARD);
+    }
+
+    /**
+     * Store forever key references into store.
+     *
+     * @param  string  $namespace
+     * @param  string  $key
+     * @return void
+     */
+    protected function pushForeverKeys($namespace, $key)
+    {
+        $this->pushKeys($namespace, $key, self::REFERENCE_KEY_FOREVER);
+    }
+
+    /**
+     * Store a reference to the cache key against the reference key.
+     *
+     * @param  string  $namespace
+     * @param  string  $key
+     * @param  string  $reference
+     * @return void
+     */
+    protected function pushKeys($namespace, $key, $reference)
+    {
+        $fullKey = $this->store->getPrefix().sha1($namespace).':'.$key;
+
+        foreach (explode('|', $namespace) as $segment) {
+            $this->store->connection()->sadd($this->referenceKey($segment, $reference), $fullKey);
+        }
+    }
+
+    /**
+     * Delete all of the items that were stored forever.
      *
      * @return void
      */
-    protected function flushValues()
+    protected function deleteForeverKeys()
     {
-        $entries = $this->tags->entries()
-            ->map(fn (string $key) => $this->store->getPrefix().$key)
-            ->chunk(1000);
+        $this->deleteKeysByReference(self::REFERENCE_KEY_FOREVER);
+    }
 
-        $connection = $this->store->connection();
+    /**
+     * Delete all standard items.
+     *
+     * @return void
+     */
+    protected function deleteStandardKeys()
+    {
+        $this->deleteKeysByReference(self::REFERENCE_KEY_STANDARD);
+    }
 
-        foreach ($entries as $cacheKeys) {
-            if ($connection instanceof PredisClusterConnection) {
-                $connection->pipeline(function ($connection) use ($cacheKeys) {
-                    foreach ($cacheKeys as $cacheKey) {
-                        $connection->del($cacheKey);
-                    }
-                });
-            } else {
-                $connection->del(...$cacheKeys);
-            }
+    /**
+     * Find and delete all of the items that were stored against a reference.
+     *
+     * @param  string  $reference
+     * @return void
+     */
+    protected function deleteKeysByReference($reference)
+    {
+        foreach (explode('|', $this->tags->getNamespace()) as $segment) {
+            $this->deleteValues($segment = $this->referenceKey($segment, $reference));
+
+            $this->store->connection()->del($segment);
         }
     }
 
     /**
-     * Remove all stale reference entries from the tag set.
+     * Delete item keys that have been stored against a reference.
      *
-     * @return bool
+     * @param  string  $referenceKey
+     * @return void
      */
-    public function flushStale()
+    protected function deleteValues($referenceKey)
     {
-        $this->tags->flushStaleEntries();
+        $cursor = $defaultCursorValue = '0';
 
-        return true;
+        do {
+            [$cursor, $valuesChunk] = $this->store->connection()->sscan(
+                $referenceKey, $cursor, ['match' => '*', 'count' => 1000]
+            );
+
+            // PhpRedis client returns false if set does not exist or empty. Array destruction
+            // on false stores null in each variable. If valuesChunk is null, it means that
+            // there were not results from the previously executed "sscan" Redis command.
+            if (is_null($valuesChunk)) {
+                break;
+            }
+
+            $valuesChunk = array_unique($valuesChunk);
+
+            if (count($valuesChunk) > 0) {
+                $this->store->connection()->del(...$valuesChunk);
+            }
+        } while (((string) $cursor) !== $defaultCursorValue);
+    }
+
+    /**
+     * Get the reference key for the segment.
+     *
+     * @param  string  $segment
+     * @param  string  $suffix
+     * @return string
+     */
+    protected function referenceKey($segment, $suffix)
+    {
+        return $this->store->getPrefix().$segment.':'.$suffix;
     }
 }

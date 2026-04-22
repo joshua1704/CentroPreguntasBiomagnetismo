@@ -23,7 +23,7 @@ class RedisJob extends Job implements JobContract
     protected $job;
 
     /**
-     * The decoded JSON version of "$job".
+     * The JSON decoded version of "$job".
      *
      * @var array
      */
@@ -45,6 +45,7 @@ class RedisJob extends Job implements JobContract
      * @param  string  $reserved
      * @param  string  $connectionName
      * @param  string  $queue
+     * @return void
      */
     public function __construct(Container $container, RedisQueue $redis, $job, $reserved, $connectionName, $queue)
     {
@@ -84,7 +85,7 @@ class RedisJob extends Job implements JobContract
     }
 
     /**
-     * Release the job back into the queue after (n) seconds.
+     * Release the job back into the queue.
      *
      * @param  int  $delay
      * @return void

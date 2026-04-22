@@ -11,14 +11,16 @@ namespace Nette\Localization;
 
 
 /**
- * Translation provider.
+ * Translator adapter.
  */
 interface Translator
 {
 	/**
 	 * Translates the given string.
+	 * @param  mixed  $message
+	 * @param  mixed  ...$parameters
 	 */
-	function translate(string|\Stringable $message, mixed ...$parameters): string|\Stringable;
+	function translate($message, ...$parameters): string;
 }
 
 

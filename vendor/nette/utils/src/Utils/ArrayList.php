@@ -10,26 +10,28 @@ declare(strict_types=1);
 namespace Nette\Utils;
 
 use Nette;
-use function array_slice, array_splice, count, is_int;
 
 
 /**
- * Generic list with integer indices.
+ * Provides the base class for a generic list (items can be accessed by index).
  * @template T
  * @implements \IteratorAggregate<int, T>
  * @implements \ArrayAccess<int, T>
  */
 class ArrayList implements \ArrayAccess, \Countable, \IteratorAggregate
 {
-	/** @var list<T> */
-	private array $list = [];
+	use Nette\SmartObject;
+
+	/** @var mixed[] */
+	private $list = [];
 
 
 	/**
 	 * Transforms array to ArrayList.
 	 * @param  list<T>  $array
+	 * @return static
 	 */
-	public static function from(array $array): static
+	public static function from(array $array)
 	{
 		if (!Arrays::isList($array)) {
 			throw new Nette\InvalidArgumentException('Array is not valid list.');
@@ -42,16 +44,18 @@ class ArrayList implements \ArrayAccess, \Countable, \IteratorAggregate
 
 
 	/**
-	 * @return \Iterator<int, T>
+	 * Returns an iterator over all items.
+	 * @return \ArrayIterator<int, T>
 	 */
-	public function &getIterator(): \Iterator
+	public function getIterator(): \ArrayIterator
 	{
-		foreach ($this->list as &$item) {
-			yield $item;
-		}
+		return new \ArrayIterator($this->list);
 	}
 
 
+	/**
+	 * Returns items count.
+	 */
 	public function count(): int
 	{
 		return count($this->list);
@@ -59,8 +63,8 @@ class ArrayList implements \ArrayAccess, \Countable, \IteratorAggregate
 
 
 	/**
-	 * Replaces or appends an item.
-	 * @param  ?int  $index
+	 * Replaces or appends a item.
+	 * @param  int|null  $index
 	 * @param  T  $value
 	 * @throws Nette\OutOfRangeException
 	 */
@@ -79,12 +83,13 @@ class ArrayList implements \ArrayAccess, \Countable, \IteratorAggregate
 
 
 	/**
-	 * Returns an item.
+	 * Returns a item.
 	 * @param  int  $index
 	 * @return T
 	 * @throws Nette\OutOfRangeException
 	 */
-	public function offsetGet($index): mixed
+	#[\ReturnTypeWillChange]
+	public function offsetGet($index)
 	{
 		if (!is_int($index) || $index < 0 || $index >= count($this->list)) {
 			throw new Nette\OutOfRangeException('Offset invalid or out of range');
@@ -95,7 +100,7 @@ class ArrayList implements \ArrayAccess, \Countable, \IteratorAggregate
 
 
 	/**
-	 * Determines whether an item exists.
+	 * Determines whether a item exists.
 	 * @param  int  $index
 	 */
 	public function offsetExists($index): bool
@@ -120,10 +125,10 @@ class ArrayList implements \ArrayAccess, \Countable, \IteratorAggregate
 
 
 	/**
-	 * Prepends an item.
+	 * Prepends a item.
 	 * @param  T  $value
 	 */
-	public function prepend(mixed $value): void
+	public function prepend($value): void
 	{
 		$first = array_slice($this->list, 0, 1);
 		$this->offsetSet(0, $value);

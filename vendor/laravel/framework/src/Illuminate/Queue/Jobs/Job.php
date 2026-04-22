@@ -2,14 +2,10 @@
 
 namespace Illuminate\Queue\Jobs;
 
-use Illuminate\Bus\Batchable;
-use Illuminate\Bus\BatchRepository;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\ManuallyFailedException;
-use Illuminate\Queue\TimeoutExceededException;
 use Illuminate\Support\InteractsWithTime;
-use Throwable;
 
 abstract class Job
 {
@@ -67,7 +63,7 @@ abstract class Job
     /**
      * Get the job identifier.
      *
-     * @return string|int|null
+     * @return string
      */
     abstract public function getJobId();
 
@@ -123,7 +119,7 @@ abstract class Job
     }
 
     /**
-     * Release the job back into the queue after (n) seconds.
+     * Release the job back into the queue.
      *
      * @param  int  $delay
      * @return void
@@ -187,29 +183,6 @@ abstract class Job
             return;
         }
 
-        $commandName = $this->payload()['data']['commandName'] ?? false;
-
-        // If the exception is due to a job timing out, we need to rollback the current
-        // database transaction so that the failed job count can be incremented with
-        // the proper value. Otherwise, the current transaction will never commit.
-        if ($e instanceof TimeoutExceededException &&
-            $commandName &&
-            isset(class_uses_recursive($commandName)[Batchable::class])) {
-            $batchRepository = $this->resolve(BatchRepository::class);
-
-            try {
-                $batchRepository->rollBack();
-            } catch (Throwable $e) {
-                // ...
-            }
-        }
-
-        if ($this->shouldRollBackDatabaseTransaction($e)) {
-            $this->container->make('db')
-                ->connection($this->container['config']['queue.failed.database'])
-                ->rollBack(toLevel: 0);
-        }
-
         try {
             // If the job has failed, we will delete it, call the "failed" method and then call
             // an event indicating the job has failed so it can be logged if needed. This is
@@ -225,20 +198,6 @@ abstract class Job
     }
 
     /**
-     * Determine if the current database transaction should be rolled back to level zero.
-     *
-     * @param  \Throwable  $e
-     * @return bool
-     */
-    protected function shouldRollBackDatabaseTransaction($e)
-    {
-        return $e instanceof TimeoutExceededException &&
-            $this->container['config']['queue.failed.database'] &&
-            in_array($this->container['config']['queue.failed.driver'], ['database', 'database-uuids']) &&
-            $this->container->bound('db');
-    }
-
-    /**
      * Process an exception that caused the job to fail.
      *
      * @param  \Throwable|null  $e
@@ -248,10 +207,10 @@ abstract class Job
     {
         $payload = $this->payload();
 
-        [$class] = JobName::parse($payload['job']);
+        [$class, $method] = JobName::parse($payload['job']);
 
         if (method_exists($this->instance = $this->resolve($class), 'failed')) {
-            $this->instance->failed($payload['data'], $e, $payload['uuid'] ?? '', $this);
+            $this->instance->failed($payload['data'], $e, $payload['uuid'] ?? '');
         }
     }
 
@@ -319,7 +278,7 @@ abstract class Job
     /**
      * The number of seconds to wait before retrying a job that encountered an uncaught exception.
      *
-     * @return int|int[]|null
+     * @return int|null
      */
     public function backoff()
     {
@@ -343,7 +302,7 @@ abstract class Job
      */
     public function retryUntil()
     {
-        return $this->payload()['retryUntil'] ?? null;
+        return $this->payload()['retryUntil'] ?? $this->payload()['timeoutAt'] ?? null;
     }
 
     /**
@@ -357,7 +316,7 @@ abstract class Job
     }
 
     /**
-     * Get the resolved display name of the queued job class.
+     * Get the resolved name of the queued job class.
      *
      * Resolves the name of "wrapped" jobs such as class-based handlers.
      *
@@ -366,18 +325,6 @@ abstract class Job
     public function resolveName()
     {
         return JobName::resolve($this->getName(), $this->payload());
-    }
-
-    /**
-     * Get the class of the queued job.
-     *
-     * Resolves the class of "wrapped" jobs such as class-based handlers.
-     *
-     * @return string
-     */
-    public function resolveQueuedJobClass()
-    {
-        return JobName::resolveClassName($this->getName(), $this->payload());
     }
 
     /**

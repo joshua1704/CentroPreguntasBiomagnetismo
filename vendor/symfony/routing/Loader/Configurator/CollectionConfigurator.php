@@ -23,25 +23,30 @@ class CollectionConfigurator
     use Traits\HostTrait;
     use Traits\RouteTrait;
 
-    private string|array|null $host = null;
+    private $parent;
+    private $parentConfigurator;
+    private $parentPrefixes;
+    private $host;
 
-    public function __construct(
-        private RouteCollection $parent,
-        string $name,
-        private ?self $parentConfigurator = null, // for GC control
-        private ?array $parentPrefixes = null,
-    ) {
+    public function __construct(RouteCollection $parent, string $name, ?self $parentConfigurator = null, ?array $parentPrefixes = null)
+    {
+        $this->parent = $parent;
         $this->name = $name;
         $this->collection = new RouteCollection();
         $this->route = new Route('');
+        $this->parentConfigurator = $parentConfigurator; // for GC control
+        $this->parentPrefixes = $parentPrefixes;
     }
 
-    public function __serialize(): array
+    /**
+     * @return array
+     */
+    public function __sleep()
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
 
-    public function __unserialize(array $data): void
+    public function __wakeup()
     {
         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
     }
@@ -73,17 +78,17 @@ class CollectionConfigurator
      *
      * @return $this
      */
-    final public function prefix(string|array $prefix): static
+    final public function prefix($prefix): self
     {
         if (\is_array($prefix)) {
             if (null === $this->parentPrefixes) {
                 // no-op
             } elseif ($missing = array_diff_key($this->parentPrefixes, $prefix)) {
-                throw new \LogicException(\sprintf('Collection "%s" is missing prefixes for locale(s) "%s".', $this->name, implode('", "', array_keys($missing))));
+                throw new \LogicException(sprintf('Collection "%s" is missing prefixes for locale(s) "%s".', $this->name, implode('", "', array_keys($missing))));
             } else {
                 foreach ($prefix as $locale => $localePrefix) {
                     if (!isset($this->parentPrefixes[$locale])) {
-                        throw new \LogicException(\sprintf('Collection "%s" with locale "%s" is missing a corresponding prefix in its parent collection.', $this->name, $locale));
+                        throw new \LogicException(sprintf('Collection "%s" with locale "%s" is missing a corresponding prefix in its parent collection.', $this->name, $locale));
                     }
 
                     $prefix[$locale] = $this->parentPrefixes[$locale].$localePrefix;
@@ -106,16 +111,13 @@ class CollectionConfigurator
      *
      * @return $this
      */
-    final public function host(string|array $host): static
+    final public function host($host): self
     {
         $this->host = $host;
 
         return $this;
     }
 
-    /**
-     * This method overrides the one from LocalizedRouteTrait.
-     */
     private function createRoute(string $path): Route
     {
         return (clone $this->route)->setPath($path);

@@ -26,14 +26,15 @@ class Manager
      * Create a new queue capsule manager.
      *
      * @param  \Illuminate\Container\Container|null  $container
+     * @return void
      */
-    public function __construct(?Container $container = null)
+    public function __construct(Container $container = null)
     {
         $this->setupContainer($container ?: new Container);
 
-        // Once we have the container setup, we will set up the default configuration
-        // options in the container "config" bindings. This'll just make the queue
-        // manager behave correctly since all the correct bindings are in place.
+        // Once we have the container setup, we will setup the default configuration
+        // options in the container "config" bindings. This just makes this queue
+        // manager behave correctly since all the correct binding are in place.
         $this->setupDefaultConfiguration();
 
         $this->setupManager();
@@ -113,7 +114,7 @@ class Manager
     }
 
     /**
-     * Push a new job onto the queue after (n) seconds.
+     * Push a new job onto the queue after a delay.
      *
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string  $job

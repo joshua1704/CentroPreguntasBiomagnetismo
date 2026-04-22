@@ -2,21 +2,18 @@
     "$schema": "https://getcomposer.org/schema.json",
     "name": "laravel/laravel",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "Laravel 8 application compatible with PHP 7.3.",
     "keywords": ["laravel", "framework"],
     "license": "MIT",
     "require": {
-        "php": "^8.3",
-        "laravel/framework": "^13.0",
-        "laravel/tinker": "^3.0"
+        "php": "^7.3",
+        "laravel/framework": "^8.0",
+        "laravel/tinker": "^2.7"
     },
     "require-dev": {
-        "fakerphp/faker": "^1.23",
-        "laravel/pail": "^1.2.5",
-        "laravel/pint": "^1.27",
-        "mockery/mockery": "^1.6",
-        "nunomaduro/collision": "^8.6",
-        "phpunit/phpunit": "^12.5.12"
+        "fakerphp/faker": "^1.9.1",
+        "nunomaduro/collision": "^5.0",
+        "phpunit/phpunit": "^9.5"
     },
     "autoload": {
         "psr-4": {

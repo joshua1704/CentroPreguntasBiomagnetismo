@@ -21,7 +21,9 @@ trait InteractsWithDeprecationHandling
     protected function withDeprecationHandling()
     {
         if ($this->originalDeprecationHandler) {
-            set_error_handler(tap($this->originalDeprecationHandler, fn () => $this->originalDeprecationHandler = null));
+            set_error_handler(tap($this->originalDeprecationHandler, function () {
+                $this->originalDeprecationHandler = null;
+            }));
         }
 
         return $this;
@@ -31,8 +33,6 @@ trait InteractsWithDeprecationHandling
      * Disable deprecation handling for the test.
      *
      * @return $this
-     *
-     * @throws \ErrorException
      */
     protected function withoutDeprecationHandling()
     {

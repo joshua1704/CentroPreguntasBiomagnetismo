@@ -7,7 +7,7 @@ interface Gate
     /**
      * Determine if a given ability has been defined.
      *
-     * @param  \UnitEnum|string  $ability
+     * @param  string  $ability
      * @return bool
      */
     public function has($ability);
@@ -15,7 +15,7 @@ interface Gate
     /**
      * Define a new ability.
      *
-     * @param  \UnitEnum|string  $ability
+     * @param  string  $ability
      * @param  callable|string  $callback
      * @return $this
      */
@@ -29,7 +29,7 @@ interface Gate
      * @param  array|null  $abilities
      * @return $this
      */
-    public function resource($name, $class, ?array $abilities = null);
+    public function resource($name, $class, array $abilities = null);
 
     /**
      * Define a policy class for a given class type.
@@ -57,19 +57,19 @@ interface Gate
     public function after(callable $callback);
 
     /**
-     * Determine if all of the given abilities should be granted for the current user.
+     * Determine if the given ability should be granted for the current user.
      *
-     * @param  iterable|\UnitEnum|string  $ability
-     * @param  mixed  $arguments
+     * @param  string  $ability
+     * @param  array|mixed  $arguments
      * @return bool
      */
     public function allows($ability, $arguments = []);
 
     /**
-     * Determine if any of the given abilities should be denied for the current user.
+     * Determine if the given ability should be denied for the current user.
      *
-     * @param  iterable|\UnitEnum|string  $ability
-     * @param  mixed  $arguments
+     * @param  string  $ability
+     * @param  array|mixed  $arguments
      * @return bool
      */
     public function denies($ability, $arguments = []);
@@ -77,8 +77,8 @@ interface Gate
     /**
      * Determine if all of the given abilities should be granted for the current user.
      *
-     * @param  iterable|\UnitEnum|string  $abilities
-     * @param  mixed  $arguments
+     * @param  iterable|string  $abilities
+     * @param  array|mixed  $arguments
      * @return bool
      */
     public function check($abilities, $arguments = []);
@@ -86,8 +86,8 @@ interface Gate
     /**
      * Determine if any one of the given abilities should be granted for the current user.
      *
-     * @param  iterable|\UnitEnum|string  $abilities
-     * @param  mixed  $arguments
+     * @param  iterable|string  $abilities
+     * @param  array|mixed  $arguments
      * @return bool
      */
     public function any($abilities, $arguments = []);
@@ -95,8 +95,8 @@ interface Gate
     /**
      * Determine if the given ability should be granted for the current user.
      *
-     * @param  \UnitEnum|string  $ability
-     * @param  mixed  $arguments
+     * @param  string  $ability
+     * @param  array|mixed  $arguments
      * @return \Illuminate\Auth\Access\Response
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
@@ -106,8 +106,8 @@ interface Gate
     /**
      * Inspect the user for the given ability.
      *
-     * @param  \UnitEnum|string  $ability
-     * @param  mixed  $arguments
+     * @param  string  $ability
+     * @param  array|mixed  $arguments
      * @return \Illuminate\Auth\Access\Response
      */
     public function inspect($ability, $arguments = []);
@@ -116,7 +116,7 @@ interface Gate
      * Get the raw result from the authorization callback.
      *
      * @param  string  $ability
-     * @param  mixed  $arguments
+     * @param  array|mixed  $arguments
      * @return mixed
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException

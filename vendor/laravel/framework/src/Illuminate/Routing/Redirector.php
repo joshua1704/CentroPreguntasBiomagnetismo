@@ -28,10 +28,22 @@ class Redirector
      * Create a new Redirector instance.
      *
      * @param  \Illuminate\Routing\UrlGenerator  $generator
+     * @return void
      */
     public function __construct(UrlGenerator $generator)
     {
         $this->generator = $generator;
+    }
+
+    /**
+     * Create a new redirect response to the "home" route.
+     *
+     * @param  int  $status
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function home($status = 302)
+    {
+        return $this->to($this->generator->route('home'), $status);
     }
 
     /**
@@ -72,9 +84,9 @@ class Redirector
     {
         $request = $this->generator->getRequest();
 
-        $intended = $request->isMethod('GET') && $request->route() && ! $request->expectsJson()
-            ? $this->generator->full()
-            : $this->generator->previous();
+        $intended = $request->method() === 'GET' && $request->route() && ! $request->expectsJson()
+                        ? $this->generator->full()
+                        : $this->generator->previous();
 
         if ($intended) {
             $this->setIntendedUrl($intended);
@@ -86,7 +98,7 @@ class Redirector
     /**
      * Create a new redirect response to the previously intended location.
      *
-     * @param  mixed  $default
+     * @param  string  $default
      * @param  int  $status
      * @param  array  $headers
      * @param  bool|null  $secure
@@ -97,6 +109,17 @@ class Redirector
         $path = $this->session->pull('url.intended', $default);
 
         return $this->to($path, $status, $headers, $secure);
+    }
+
+    /**
+     * Set the intended url.
+     *
+     * @param  string  $url
+     * @return void
+     */
+    public function setIntendedUrl($url)
+    {
+        $this->session->put('url.intended', $url);
     }
 
     /**
@@ -142,7 +165,7 @@ class Redirector
     /**
      * Create a new redirect response to a named route.
      *
-     * @param  \BackedEnum|string  $route
+     * @param  string  $route
      * @param  mixed  $parameters
      * @param  int  $status
      * @param  array  $headers
@@ -156,7 +179,7 @@ class Redirector
     /**
      * Create a new redirect response to a signed named route.
      *
-     * @param  \BackedEnum|string  $route
+     * @param  string  $route
      * @param  mixed  $parameters
      * @param  \DateTimeInterface|\DateInterval|int|null  $expiration
      * @param  int  $status
@@ -171,7 +194,7 @@ class Redirector
     /**
      * Create a new redirect response to a signed named route.
      *
-     * @param  \BackedEnum|string  $route
+     * @param  string  $route
      * @param  \DateTimeInterface|\DateInterval|int|null  $expiration
      * @param  mixed  $parameters
      * @param  int  $status
@@ -235,28 +258,5 @@ class Redirector
     public function setSession(SessionStore $session)
     {
         $this->session = $session;
-    }
-
-    /**
-     * Get the "intended" URL from the session.
-     *
-     * @return string|null
-     */
-    public function getIntendedUrl()
-    {
-        return $this->session->get('url.intended');
-    }
-
-    /**
-     * Set the "intended" URL in the session.
-     *
-     * @param  string  $url
-     * @return $this
-     */
-    public function setIntendedUrl($url)
-    {
-        $this->session->put('url.intended', $url);
-
-        return $this;
     }
 }

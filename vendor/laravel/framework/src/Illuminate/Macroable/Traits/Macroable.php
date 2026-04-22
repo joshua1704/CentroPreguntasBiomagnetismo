@@ -6,8 +6,6 @@ use BadMethodCallException;
 use Closure;
 use ReflectionClass;
 use ReflectionMethod;
-use RuntimeException;
-use Throwable;
 
 trait Macroable
 {
@@ -23,9 +21,6 @@ trait Macroable
      *
      * @param  string  $name
      * @param  object|callable  $macro
-     *
-     * @param-closure-this static  $macro
-     *
      * @return void
      */
     public static function macro($name, $macro)
@@ -50,6 +45,7 @@ trait Macroable
 
         foreach ($methods as $method) {
             if ($replace || ! static::hasMacro($method->name)) {
+                $method->setAccessible(true);
                 static::macro($method->name, $method->invoke($mixin));
             }
         }
@@ -122,11 +118,7 @@ trait Macroable
         $macro = static::$macros[$method];
 
         if ($macro instanceof Closure) {
-            try {
-                $macro = $macro->bindTo($this, static::class) ?? throw new RuntimeException;
-            } catch (Throwable) {
-                $macro = $macro->bindTo(null, static::class);
-            }
+            $macro = $macro->bindTo($this, static::class);
         }
 
         return $macro(...$parameters);

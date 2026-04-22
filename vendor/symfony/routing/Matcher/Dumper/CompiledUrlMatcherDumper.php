@@ -26,31 +26,34 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class CompiledUrlMatcherDumper extends MatcherDumper
 {
-    private ExpressionLanguage $expressionLanguage;
-    private ?\Exception $signalingException = null;
+    private $expressionLanguage;
+    private $signalingException;
 
     /**
      * @var ExpressionFunctionProviderInterface[]
      */
-    private array $expressionLanguageProviders = [];
+    private $expressionLanguageProviders = [];
 
-    public function dump(array $options = []): string
+    /**
+     * {@inheritdoc}
+     */
+    public function dump(array $options = [])
     {
         return <<<EOF
-            <?php
+<?php
 
-            /**
-             * This file has been auto-generated
-             * by the Symfony Routing Component.
-             */
+/**
+ * This file has been auto-generated
+ * by the Symfony Routing Component.
+ */
 
-            return [
-            {$this->generateCompiledRoutes()}];
+return [
+{$this->generateCompiledRoutes()}];
 
-            EOF;
+EOF;
     }
 
-    public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider): void
+    public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider)
     {
         $this->expressionLanguageProviders[] = $provider;
     }
@@ -112,12 +115,12 @@ class CompiledUrlMatcherDumper extends MatcherDumper
             }
 
             $checkConditionCode = <<<EOF
-                    static function (\$condition, \$context, \$request, \$params) { // \$checkCondition
-                        switch (\$condition) {
-                {$this->indent(implode("\n", $conditions), 3)}
-                        }
-                    }
-                EOF;
+    static function (\$condition, \$context, \$request) { // \$checkCondition
+        switch (\$condition) {
+{$this->indent(implode("\n", $conditions), 3)}
+        }
+    }
+EOF;
             $compiledRoutes[4] = $forDump ? $checkConditionCode.",\n" : eval('return '.$checkConditionCode.';');
         } else {
             $compiledRoutes[4] = $forDump ? "    null, // \$checkCondition\n" : null;
@@ -134,7 +137,7 @@ class CompiledUrlMatcherDumper extends MatcherDumper
 
         $code .= '[ // $staticRoutes'."\n";
         foreach ($staticRoutes as $path => $routes) {
-            $code .= \sprintf("    %s => [\n", self::export($path));
+            $code .= sprintf("    %s => [\n", self::export($path));
             foreach ($routes as $route) {
                 $code .= vsprintf("        [%s, %s, %s, %s, %s, %s, %s],\n", array_map([__CLASS__, 'export'], $route));
             }
@@ -142,11 +145,11 @@ class CompiledUrlMatcherDumper extends MatcherDumper
         }
         $code .= "],\n";
 
-        $code .= \sprintf("[ // \$regexpList%s\n],\n", $regexpCode);
+        $code .= sprintf("[ // \$regexpList%s\n],\n", $regexpCode);
 
         $code .= '[ // $dynamicRoutes'."\n";
         foreach ($dynamicRoutes as $path => $routes) {
-            $code .= \sprintf("    %s => [\n", self::export($path));
+            $code .= sprintf("    %s => [\n", self::export($path));
             foreach ($routes as $route) {
                 $code .= vsprintf("        [%s, %s, %s, %s, %s, %s, %s],\n", array_map([__CLASS__, 'export'], $route));
             }
@@ -219,12 +222,7 @@ class CompiledUrlMatcherDumper extends MatcherDumper
         foreach ($staticRoutes as $url => $routes) {
             $compiledRoutes[$url] = [];
             foreach ($routes as $name => [$route, $hasTrailingSlash]) {
-                if ($route->compile()->getHostVariables()) {
-                    $host = $route->compile()->getHostRegex();
-                } elseif ($host = $route->getHost()) {
-                    $host = strtolower($host);
-                }
-                $compiledRoutes[$url][] = $this->compileRoute($route, $name, $host ?: null, $hasTrailingSlash, false, $conditions);
+                $compiledRoutes[$url][] = $this->compileRoute($route, $name, (!$route->compile()->getHostVariables() ? $route->getHost() : $route->compile()->getHostRegex()) ?: null, $hasTrailingSlash, false, $conditions);
             }
         }
 
@@ -334,7 +332,7 @@ class CompiledUrlMatcherDumper extends MatcherDumper
                     if ($hasTrailingSlash = '/' !== $regex && '/' === $regex[-1]) {
                         $regex = substr($regex, 0, -1);
                     }
-                    $hasTrailingVar = (bool) preg_match('#\{[\w\x80-\xFF]+\}/?$#', $route->getPath());
+                    $hasTrailingVar = (bool) preg_match('#\{\w+\}/?$#', $route->getPath());
 
                     $tree->addRoute($regex, [$name, $regex, $state->vars, $route, $hasTrailingSlash, $hasTrailingVar]);
                 }
@@ -351,7 +349,7 @@ class CompiledUrlMatcherDumper extends MatcherDumper
             $state->markTail = 0;
 
             // if the regex is too large, throw a signaling exception to recompute with smaller chunk size
-            set_error_handler(fn ($type, $message) => throw str_contains($message, $this->signalingException->getMessage()) ? $this->signalingException : new \ErrorException($message));
+            set_error_handler(function ($type, $message) { throw str_contains($message, $this->signalingException->getMessage()) ? $this->signalingException : new \ErrorException($message); });
             try {
                 preg_match($state->regex, '');
             } finally {
@@ -404,7 +402,7 @@ class CompiledUrlMatcherDumper extends MatcherDumper
 
             $state->mark += 3 + $state->markTail + \strlen($regex) - $prefixLen;
             $state->markTail = 2 + \strlen($state->mark);
-            $rx = \sprintf('|%s(*:%s)', substr($regex, $prefixLen), $state->mark);
+            $rx = sprintf('|%s(*:%s)', substr($regex, $prefixLen), $state->mark);
             $code .= "\n            .".self::export($rx);
             $state->regex .= $rx;
 
@@ -418,7 +416,7 @@ class CompiledUrlMatcherDumper extends MatcherDumper
     /**
      * Compiles a single Route to PHP code used to match it against the path info.
      */
-    private function compileRoute(Route $route, string $name, string|array|null $vars, bool $hasTrailingSlash, bool $hasTrailingVar, array &$conditions): array
+    private function compileRoute(Route $route, string $name, $vars, bool $hasTrailingSlash, bool $hasTrailingVar, array &$conditions): array
     {
         $defaults = $route->getDefaults();
 
@@ -428,8 +426,8 @@ class CompiledUrlMatcherDumper extends MatcherDumper
         }
 
         if ($condition = $route->getCondition()) {
-            $condition = $this->getExpressionLanguage()->compile($condition, ['context', 'request', 'params']);
-            $condition = $conditions[$condition] ??= (str_contains($condition, '$request') ? 1 : -1) * \count($conditions);
+            $condition = $this->getExpressionLanguage()->compile($condition, ['context', 'request']);
+            $condition = $conditions[$condition] ?? $conditions[$condition] = (str_contains($condition, '$request') ? 1 : -1) * \count($conditions);
         } else {
             $condition = null;
         }
@@ -447,9 +445,9 @@ class CompiledUrlMatcherDumper extends MatcherDumper
 
     private function getExpressionLanguage(): ExpressionLanguage
     {
-        if (!isset($this->expressionLanguage)) {
+        if (null === $this->expressionLanguage) {
             if (!class_exists(ExpressionLanguage::class)) {
-                throw new \LogicException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed. Try running "composer require symfony/expression-language".');
+                throw new \LogicException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
             }
             $this->expressionLanguage = new ExpressionLanguage(null, $this->expressionLanguageProviders);
         }
@@ -465,15 +463,16 @@ class CompiledUrlMatcherDumper extends MatcherDumper
     /**
      * @internal
      */
-    public static function export(mixed $value): string
+    public static function export($value): string
     {
         if (null === $value) {
             return 'null';
         }
-        if (\is_object($value)) {
-            throw new \InvalidArgumentException(\sprintf('Symfony\Component\Routing\Route cannot contain objects, but "%s" given.', get_debug_type($value)));
-        }
         if (!\is_array($value)) {
+            if (\is_object($value)) {
+                throw new \InvalidArgumentException('Symfony\Component\Routing\Route cannot contain objects.');
+            }
+
             return str_replace("\n", '\'."\n".\'', var_export($value, true));
         }
         if (!$value) {

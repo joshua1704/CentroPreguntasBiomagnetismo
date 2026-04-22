@@ -39,7 +39,7 @@ class ValidationException extends Exception
     /**
      * The path the client should be redirected to.
      *
-     * @var string|null
+     * @var string
      */
     public $redirectTo;
 
@@ -49,10 +49,11 @@ class ValidationException extends Exception
      * @param  \Illuminate\Contracts\Validation\Validator  $validator
      * @param  \Symfony\Component\HttpFoundation\Response|null  $response
      * @param  string  $errorBag
+     * @return void
      */
     public function __construct($validator, $response = null, $errorBag = 'default')
     {
-        parent::__construct(static::summarize($validator));
+        parent::__construct('The given data was invalid.');
 
         $this->response = $response;
         $this->errorBag = $errorBag;
@@ -74,31 +75,6 @@ class ValidationException extends Exception
                 }
             }
         }));
-    }
-
-    /**
-     * Create an error message summary from the validation errors.
-     *
-     * @param  \Illuminate\Contracts\Validation\Validator  $validator
-     * @return string
-     */
-    protected static function summarize($validator)
-    {
-        $messages = $validator->errors()->all();
-
-        if (! count($messages) || ! is_string($messages[0])) {
-            return $validator->getTranslator()->get('The given data was invalid.');
-        }
-
-        $message = array_shift($messages);
-
-        if ($count = count($messages)) {
-            $pluralized = $count === 1 ? 'error' : 'errors';
-
-            $message .= ' '.$validator->getTranslator()->choice("(and :count more $pluralized)", $count, compact('count'));
-        }
-
-        return $message;
     }
 
     /**

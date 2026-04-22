@@ -3,21 +3,12 @@
 namespace Illuminate\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
-use Illuminate\Console\Concerns\FindsAvailableModels;
-use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use Symfony\Component\Console\Completion\CompletionInput;
-use Symfony\Component\Console\Completion\CompletionSuggestions;
-use Symfony\Component\Console\Completion\Suggestion;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Finder\Finder;
 
-abstract class GeneratorCommand extends Command implements PromptsForMissingInput
+abstract class GeneratorCommand extends Command
 {
-    use FindsAvailableModels;
-
     /**
      * The filesystem instance.
      *
@@ -65,11 +56,9 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         'endif',
         'endswitch',
         'endwhile',
-        'enum',
         'eval',
         'exit',
         'extends',
-        'false',
         'final',
         'finally',
         'fn',
@@ -87,25 +76,20 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         'interface',
         'isset',
         'list',
-        'match',
         'namespace',
         'new',
         'or',
-        'parent',
         'print',
         'private',
         'protected',
         'public',
-        'readonly',
         'require',
         'require_once',
         'return',
-        'self',
         'static',
         'switch',
         'throw',
         'trait',
-        'true',
         'try',
         'unset',
         'use',
@@ -113,24 +97,19 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         'while',
         'xor',
         'yield',
-        '__CLASS__',
-        '__DIR__',
-        '__FILE__',
-        '__FUNCTION__',
-        '__LINE__',
-        '__METHOD__',
-        '__NAMESPACE__',
-        '__TRAIT__',
     ];
 
     /**
-     * Create a new generator command instance.
+     * Create a new controller creator command instance.
+     *
+     * @param  \Illuminate\Filesystem\Filesystem  $files
+     * @return void
      */
     public function __construct(Filesystem $files)
     {
         parent::__construct();
 
-        if (isset(class_uses_recursive($this)[CreatesMatchingTest::class])) {
+        if (in_array(CreatesMatchingTest::class, class_uses_recursive($this))) {
             $this->addTestOptions();
         }
 
@@ -157,7 +136,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         // language and that the class name will actually be valid. If it is not valid we
         // can error now and prevent from polluting the filesystem using invalid files.
         if ($this->isReservedName($this->getNameInput())) {
-            $this->components->error('The name "'.$this->getNameInput().'" is reserved by PHP.');
+            $this->error('The name "'.$this->getNameInput().'" is reserved by PHP.');
 
             return false;
         }
@@ -172,7 +151,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         if ((! $this->hasOption('force') ||
              ! $this->option('force')) &&
              $this->alreadyExists($this->getNameInput())) {
-            $this->components->error($this->type.' already exists.');
+            $this->error($this->type.' already exists!');
 
             return false;
         }
@@ -184,17 +163,11 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
 
         $this->files->put($path, $this->sortImports($this->buildClass($name)));
 
-        $info = $this->type;
+        $this->info($this->type.' created successfully.');
 
-        if (isset(class_uses_recursive($this)[CreatesMatchingTest::class])) {
+        if (in_array(CreatesMatchingTest::class, class_uses_recursive($this))) {
             $this->handleTestCreation($path);
         }
-
-        if (windows_os()) {
-            $path = str_replace('/', '\\', $path);
-        }
-
-        $this->components->info(sprintf('%s [%s] created successfully.', $info, $path));
     }
 
     /**
@@ -223,7 +196,8 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
     /**
      * Qualify the given model class base name.
      *
-     * @return class-string
+     * @param  string  $model
+     * @return string
      */
     protected function qualifyModel(string $model)
     {
@@ -238,40 +212,8 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         }
 
         return is_dir(app_path('Models'))
-            ? $rootNamespace.'Models\\'.$model
-            : $rootNamespace.$model;
-    }
-
-    /**
-     * Get a list of possible model names.
-     *
-     * @return array<int, string>
-     *
-     * @deprecated 12.38.0 Use `findAvailableModels()` method instead.
-     */
-    protected function possibleModels()
-    {
-        return $this->findAvailableModels();
-    }
-
-    /**
-     * Get a list of possible event names.
-     *
-     * @return array<int, string>
-     */
-    protected function possibleEvents()
-    {
-        $eventPath = app_path('Events');
-
-        if (! is_dir($eventPath)) {
-            return [];
-        }
-
-        return (new Collection(Finder::create()->files()->depth(0)->in($eventPath)))
-            ->map(fn ($file) => $file->getBasename('.php'))
-            ->sort()
-            ->values()
-            ->all();
+                    ? $rootNamespace.'Models\\'.$model
+                    : $rootNamespace.$model;
     }
 
     /**
@@ -398,7 +340,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
      */
     protected function sortImports($stub)
     {
-        if (preg_match('/(?P<imports>(?:^use [^;{]+;$\n?)+)/m', $stub, $match)) {
+        if (preg_match('/(?P<imports>(?:use [^;]+;$\n?)+)/m', $stub, $match)) {
             $imports = explode("\n", trim($match['imports']));
 
             sort($imports);
@@ -416,13 +358,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
      */
     protected function getNameInput()
     {
-        $name = trim($this->argument('name'));
-
-        if (Str::endsWith($name, '.php')) {
-            return Str::substr($name, 0, -4);
-        }
-
-        return $name;
+        return trim($this->argument('name'));
     }
 
     /**
@@ -457,12 +393,9 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
      */
     protected function isReservedName($name)
     {
-        return in_array(
-            strtolower($name),
-            (new Collection($this->reservedNames))
-                ->transform(fn ($name) => strtolower($name))
-                ->all()
-        );
+        $name = strtolower($name);
+
+        return in_array($name, $this->reservedNames);
     }
 
     /**
@@ -481,58 +414,12 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
     /**
      * Get the console command arguments.
      *
-     * @return (InputArgument|array{
-     *    0: non-empty-string,
-     *    1?: InputArgument::REQUIRED|InputArgument::OPTIONAL|InputArgument::IS_ARRAY,
-     *    2?: string,
-     *    3?: mixed,
-     *    4?: list<string|Suggestion>|\Closure(CompletionInput, CompletionSuggestions): list<string|Suggestion>
-     * })[]
+     * @return array
      */
     protected function getArguments()
     {
         return [
-            ['name', InputArgument::REQUIRED, 'The name of the '.strtolower($this->type)],
-        ];
-    }
-
-    /**
-     * Prompt for missing input arguments using the returned questions.
-     *
-     * @return array<string, string|array{string, string}|\Closure(): (array<int, string>|string|int|bool)>
-     */
-    protected function promptForMissingArgumentsUsing()
-    {
-        return [
-            'name' => [
-                'What should the '.strtolower($this->type).' be named?',
-                match ($this->type) {
-                    'Cast' => 'E.g. Json',
-                    'Channel' => 'E.g. OrderChannel',
-                    'Console command' => 'E.g. SendEmails',
-                    'Component' => 'E.g. Alert',
-                    'Controller' => 'E.g. UserController',
-                    'Event' => 'E.g. PodcastProcessed',
-                    'Exception' => 'E.g. InvalidOrderException',
-                    'Factory' => 'E.g. PostFactory',
-                    'Job' => 'E.g. ProcessPodcast',
-                    'Listener' => 'E.g. SendPodcastNotification',
-                    'Mailable' => 'E.g. OrderShipped',
-                    'Middleware' => 'E.g. EnsureTokenIsValid',
-                    'Model' => 'E.g. Flight',
-                    'Notification' => 'E.g. InvoicePaid',
-                    'Observer' => 'E.g. UserObserver',
-                    'Policy' => 'E.g. PostPolicy',
-                    'Provider' => 'E.g. ElasticServiceProvider',
-                    'Request' => 'E.g. StorePodcastRequest',
-                    'Resource' => 'E.g. UserResource',
-                    'Rule' => 'E.g. Uppercase',
-                    'Scope' => 'E.g. TrendingScope',
-                    'Seeder' => 'E.g. UserSeeder',
-                    'Test' => 'E.g. UserTest',
-                    default => '',
-                },
-            ],
+            ['name', InputArgument::REQUIRED, 'The name of the class'],
         ];
     }
 }

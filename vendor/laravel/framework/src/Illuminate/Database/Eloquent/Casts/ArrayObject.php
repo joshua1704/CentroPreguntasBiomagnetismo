@@ -4,15 +4,8 @@ namespace Illuminate\Database\Eloquent\Casts;
 
 use ArrayObject as BaseArrayObject;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Support\Collection;
 use JsonSerializable;
 
-/**
- * @template TKey of array-key
- * @template TItem
- *
- * @extends  \ArrayObject<TKey, TItem>
- */
 class ArrayObject extends BaseArrayObject implements Arrayable, JsonSerializable
 {
     /**
@@ -22,7 +15,7 @@ class ArrayObject extends BaseArrayObject implements Arrayable, JsonSerializable
      */
     public function collect()
     {
-        return new Collection($this->getArrayCopy());
+        return collect($this->getArrayCopy());
     }
 
     /**
@@ -40,7 +33,8 @@ class ArrayObject extends BaseArrayObject implements Arrayable, JsonSerializable
      *
      * @return array
      */
-    public function jsonSerialize(): array
+    #[\ReturnTypeWillChange]
+    public function jsonSerialize()
     {
         return $this->getArrayCopy();
     }

@@ -33,13 +33,16 @@ trait CreatesUserProviders
             );
         }
 
-        return match ($driver) {
-            'database' => $this->createDatabaseProvider($config),
-            'eloquent' => $this->createEloquentProvider($config),
-            default => throw new InvalidArgumentException(
-                "Authentication user provider [{$driver}] is not defined."
-            ),
-        };
+        switch ($driver) {
+            case 'database':
+                return $this->createDatabaseProvider($config);
+            case 'eloquent':
+                return $this->createEloquentProvider($config);
+            default:
+                throw new InvalidArgumentException(
+                    "Authentication user provider [{$driver}] is not defined."
+                );
+        }
     }
 
     /**
@@ -63,11 +66,9 @@ trait CreatesUserProviders
      */
     protected function createDatabaseProvider($config)
     {
-        return new DatabaseUserProvider(
-            $this->app['db']->connection($config['connection'] ?? null),
-            $this->app['hash'],
-            $config['table'],
-        );
+        $connection = $this->app['db']->connection($config['connection'] ?? null);
+
+        return new DatabaseUserProvider($connection, $this->app['hash'], $config['table']);
     }
 
     /**

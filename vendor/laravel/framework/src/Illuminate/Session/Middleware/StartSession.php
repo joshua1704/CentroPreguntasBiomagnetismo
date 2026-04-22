@@ -33,8 +33,9 @@ class StartSession
      *
      * @param  \Illuminate\Session\SessionManager  $manager
      * @param  callable|null  $cacheFactoryResolver
+     * @return void
      */
-    public function __construct(SessionManager $manager, ?callable $cacheFactoryResolver = null)
+    public function __construct(SessionManager $manager, callable $cacheFactoryResolver = null)
     {
         $this->manager = $manager;
         $this->cacheFactoryResolver = $cacheFactoryResolver;
@@ -78,23 +79,23 @@ class StartSession
         }
 
         $lockFor = $request->route() && $request->route()->locksFor()
-            ? $request->route()->locksFor()
-            : $this->manager->defaultRouteBlockLockSeconds();
+                        ? $request->route()->locksFor()
+                        : 10;
 
         $lock = $this->cache($this->manager->blockDriver())
-            ->lock('session:'.$session->getId(), $lockFor)
-            ->betweenBlockedAttemptsSleepFor(50);
+                    ->lock('session:'.$session->getId(), $lockFor)
+                    ->betweenBlockedAttemptsSleepFor(50);
 
         try {
             $lock->block(
                 ! is_null($request->route()->waitsFor())
-                    ? $request->route()->waitsFor()
-                    : $this->manager->defaultRouteBlockWaitSeconds()
+                        ? $request->route()->waitsFor()
+                        : 10
             );
 
             return $this->handleStatefulRequest($request, $session, $next);
         } finally {
-            $lock?->release();
+            optional($lock)->release();
         }
     }
 
@@ -198,16 +199,11 @@ class StartSession
      */
     protected function storeCurrentUrl(Request $request, $session)
     {
-        if ($request->isMethod('GET') &&
+        if ($request->method() === 'GET' &&
             $request->route() instanceof Route &&
             ! $request->ajax() &&
-            ! $request->prefetch() &&
-            ! $request->isPrecognitive()) {
+            ! $request->prefetch()) {
             $session->setPreviousUrl($request->fullUrl());
-
-            if (method_exists($session, 'setPreviousRoute')) {
-                $session->setPreviousRoute($request->route()->getName());
-            }
         }
     }
 
@@ -222,16 +218,9 @@ class StartSession
     {
         if ($this->sessionIsPersistent($config = $this->manager->getSessionConfig())) {
             $response->headers->setCookie(new Cookie(
-                $session->getName(),
-                $session->getId(),
-                $this->getCookieExpirationDate(),
-                $config['path'],
-                $config['domain'],
-                $config['secure'],
-                $config['http_only'] ?? true,
-                false,
-                $config['same_site'] ?? null,
-                $config['partitioned'] ?? false
+                $session->getName(), $session->getId(), $this->getCookieExpirationDate(),
+                $config['path'], $config['domain'], $config['secure'] ?? false,
+                $config['http_only'] ?? true, false, $config['same_site'] ?? null
             ));
         }
     }
@@ -244,9 +233,7 @@ class StartSession
      */
     protected function saveSession($request)
     {
-        if (! $request->isPrecognitive()) {
-            $this->manager->driver()->save();
-        }
+        $this->manager->driver()->save();
     }
 
     /**
@@ -266,11 +253,11 @@ class StartSession
      */
     protected function getCookieExpirationDate()
     {
-        return $this->manager->getSessionConfig()['expire_on_close']
-            ? 0
-            : Date::instance(
-                Carbon::now()->addSeconds($this->getSessionLifetimeInSeconds())
-            );
+        $config = $this->manager->getSessionConfig();
+
+        return $config['expire_on_close'] ? 0 : Date::instance(
+            Carbon::now()->addRealMinutes($config['lifetime'])
+        );
     }
 
     /**
@@ -289,7 +276,7 @@ class StartSession
      * @param  array|null  $config
      * @return bool
      */
-    protected function sessionIsPersistent(?array $config = null)
+    protected function sessionIsPersistent(array $config = null)
     {
         $config = $config ?: $this->manager->getSessionConfig();
 

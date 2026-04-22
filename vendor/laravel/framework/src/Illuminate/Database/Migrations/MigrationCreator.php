@@ -26,7 +26,7 @@ class MigrationCreator
     /**
      * The registered post create hooks.
      *
-     * @var (\Closure(string, string): void)[]
+     * @var array
      */
     protected $postCreate = [];
 
@@ -35,6 +35,7 @@ class MigrationCreator
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  string  $customStubPath
+     * @return void
      */
     public function __construct(Filesystem $files, $customStubPath)
     {
@@ -67,13 +68,13 @@ class MigrationCreator
         $this->files->ensureDirectoryExists(dirname($path));
 
         $this->files->put(
-            $path, $this->populateStub($stub, $table)
+            $path, $this->populateStub($name, $stub, $table)
         );
 
         // Next, we will fire any hooks that are supposed to fire after a migration is
         // created. Once that is done we'll be ready to return the full path to the
         // migration file so it can be used however it's needed by the developer.
-        $this->firePostCreateHooks($table, $path);
+        $this->firePostCreateHooks($table);
 
         return $path;
     }
@@ -82,7 +83,7 @@ class MigrationCreator
      * Ensure that a migration with the given name doesn't already exist.
      *
      * @param  string  $name
-     * @param  string|null  $migrationPath
+     * @param  string  $migrationPath
      * @return void
      *
      * @throws \InvalidArgumentException
@@ -113,16 +114,16 @@ class MigrationCreator
     {
         if (is_null($table)) {
             $stub = $this->files->exists($customPath = $this->customStubPath.'/migration.stub')
-                ? $customPath
-                : $this->stubPath().'/migration.stub';
+                            ? $customPath
+                            : $this->stubPath().'/migration.stub';
         } elseif ($create) {
             $stub = $this->files->exists($customPath = $this->customStubPath.'/migration.create.stub')
-                ? $customPath
-                : $this->stubPath().'/migration.create.stub';
+                            ? $customPath
+                            : $this->stubPath().'/migration.create.stub';
         } else {
             $stub = $this->files->exists($customPath = $this->customStubPath.'/migration.update.stub')
-                ? $customPath
-                : $this->stubPath().'/migration.update.stub';
+                            ? $customPath
+                            : $this->stubPath().'/migration.update.stub';
         }
 
         return $this->files->get($stub);
@@ -131,12 +132,18 @@ class MigrationCreator
     /**
      * Populate the place-holders in the migration stub.
      *
+     * @param  string  $name
      * @param  string  $stub
      * @param  string|null  $table
      * @return string
      */
-    protected function populateStub($stub, $table)
+    protected function populateStub($name, $stub, $table)
     {
+        $stub = str_replace(
+            ['DummyClass', '{{ class }}', '{{class}}'],
+            $this->getClassName($name), $stub
+        );
+
         // Here we will replace the table place-holders with the table specified by
         // the developer, which is useful for quickly creating a tables creation
         // or update migration from the console instead of typing it manually.
@@ -154,7 +161,7 @@ class MigrationCreator
      * Get the class name of a migration name.
      *
      * @param  string  $name
-     * @return class-string<\Illuminate\Database\Migrations\Migration>
+     * @return string
      */
     protected function getClassName($name)
     {
@@ -177,20 +184,19 @@ class MigrationCreator
      * Fire the registered post create hooks.
      *
      * @param  string|null  $table
-     * @param  string  $path
      * @return void
      */
-    protected function firePostCreateHooks($table, $path)
+    protected function firePostCreateHooks($table)
     {
         foreach ($this->postCreate as $callback) {
-            $callback($table, $path);
+            $callback($table);
         }
     }
 
     /**
      * Register a post migration create hook.
      *
-     * @param  (\Closure(string, string): void)  $callback
+     * @param  \Closure  $callback
      * @return void
      */
     public function afterCreate(Closure $callback)
