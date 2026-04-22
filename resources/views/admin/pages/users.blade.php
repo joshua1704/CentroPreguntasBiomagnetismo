@@ -63,11 +63,11 @@
                     @endif
                     <div class="mb-3">
                         <label for="exampleFormControlInput1" class="form-label">Nombre:</label>
-                        <input type="text" class="form-control" id="exampleFormControlInput1" name="name" required>
+                        <input type="text" class="form-control" id="exampleFormControlInput1" name="name" value="{{ old('name') }}" required>
                     </div>
                     <div class="mb-3">
                         <label for="exampleFormControlInput1" class="form-label">Usuario:</label>
-                        <input type="text" class="form-control" id="exampleFormControlInput1" name="username" required>
+                        <input type="text" class="form-control" id="exampleFormControlInput1" name="username" value="{{ old('username') }}" required>
                     </div>
                     <div class="mb-3">
                         <label for="exampleFormControlInput1" class="form-label">Contraseña:</label>

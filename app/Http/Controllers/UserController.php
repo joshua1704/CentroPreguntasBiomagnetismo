@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -18,7 +19,7 @@ class UserController extends Controller
     }
 
     public function store(Request $request) {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string',
             'username' => 'required|unique:users,username',
             'password' => [
@@ -56,6 +57,12 @@ class UserController extends Controller
             'password.confirmed' => __('validator.password_confirmed'),
             'password.min' => __('validator.password_min')
         ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
 
         User::create([
             'username' => $request->username,
