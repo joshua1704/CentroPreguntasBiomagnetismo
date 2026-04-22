@@ -25,7 +25,7 @@ Route::prefix('admin')->name('admin_')->group(function() {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/change_password', [AuthController::class, 'showChangePassword']);
+    Route::get('/change_password', [AuthController::class, 'showChangePassword'])->name('change_password');
     Route::post('/change_password', [AuthController::class, 'changePassword']);
 
     Route::middleware(['auth', 'force.password'])->group(function() {
