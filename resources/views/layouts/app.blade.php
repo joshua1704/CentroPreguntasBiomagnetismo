@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>@yield('title')</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="stylesheet" href="/build/assets/app-BTNiwQj5.css">
+    <script src="/build/assets/app-C3ShDR98.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.0/dist/quill.snow.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.0/dist/quill.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
