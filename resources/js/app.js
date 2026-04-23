@@ -1,7 +1,5 @@
 import * as bootstrap from 'bootstrap';
 import moment from 'moment';
-import Quill from 'quill';
-import ImageResize from 'quill-image-resize-module';
 
 window.bootstrap = bootstrap;
 
@@ -12,8 +10,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let quill = null;
     const editor = document.getElementById('editor');
     if (editor) {
-        Quill.register('modules/imageResize', ImageResize);
-
         quill = new Quill('#editor', {
             theme: 'snow',
             modules: {
@@ -32,7 +28,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         image: imageHandler
                     }
                 },
-                imageResize: {}
             }
         });
     }
