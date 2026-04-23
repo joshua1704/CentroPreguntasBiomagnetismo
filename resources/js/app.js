@@ -1,6 +1,10 @@
 import * as bootstrap from 'bootstrap';
 import moment from 'moment';
+import Quill from 'quill';
+import ImageResize from 'quill-image-resize-module';
+
 window.bootstrap = bootstrap;
+Quill.register('modules/imageResize', ImageResize);
 
 document.addEventListener('DOMContentLoaded', function() {
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
@@ -26,7 +30,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     handlers: {
                         image: imageHandler
                     }
-                }
+                },
+                imageResize: {}
             }
         });
     }
