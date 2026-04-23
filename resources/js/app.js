@@ -3,6 +3,8 @@ import moment from 'moment';
 window.bootstrap = bootstrap;
 
 document.addEventListener('DOMContentLoaded', function() {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
     // Cargar editor Quill
     let quill = null;
     const editor = document.getElementById('editor');
@@ -108,7 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 method: 'POST',
                 credentials: 'same-origin',
                 headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    'X-CSRF-TOKEN': csrfToken
                 },
                 body: formData
             });
