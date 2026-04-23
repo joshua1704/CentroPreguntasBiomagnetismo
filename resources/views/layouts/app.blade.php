@@ -14,7 +14,6 @@
 
         $appjs = $manifest['resources/js/app.js'];
         $appcss = $manifest['resources/css/app.css'];
-        dd($appcss);
     @endphp
 
     {{-- CSS
