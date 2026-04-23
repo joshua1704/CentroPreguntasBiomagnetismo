@@ -3,8 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <title>@yield('title')</title>
-    <link rel="stylesheet" href="/build/assets/app-BTNiwQj5.css">
-    <script src="/build/assets/app-C3ShDR9B.js"></script>
+    @php
+        $manifestPath = public_path('build/manifest.json');
+
+        if (!file_exists($manifestPath)) {
+            throw new Exception('Vite manifest not found');
+        }
+
+        $manifest = json_decode(file_get_contents($manifestPath), true);
+
+        $app = $manifest['resources/js/app.js'];
+    @endphp
+
+    {{-- CSS (siempre primero) --}}
+    @foreach ($app['css'] ?? [] as $css)
+        <link rel="stylesheet" href="{{ asset('build/' . $css) }}">
+    @endforeach
+
+    {{-- JS --}}
+    <script src="{{ asset('build/' . $app['file']) }}" defer></script>
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.0/dist/quill.snow.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.0/dist/quill.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
