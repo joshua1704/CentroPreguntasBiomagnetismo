@@ -13,13 +13,13 @@
         $manifest = json_decode(file_get_contents($manifestPath), true);
 
         $appjs = $manifest['resources/js/app.js'];
-        $appcss = $manifest['resouces/css/app.css'];
-        dump($appcss);
+        $appcss = $manifest['resources/css/app.css'];
+        dd($appcss);
     @endphp
 
-    {{-- CSS --}}
+    {{-- CSS
     <link rel="stylesheet" href="{{ asset('build/' . $appcss['file']) }}">
-
+    --}}
     {{-- JS --}}
     <script src="{{ asset('build/' . $appjs['file']) }}" defer></script>
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.0/dist/quill.snow.css" rel="stylesheet">
