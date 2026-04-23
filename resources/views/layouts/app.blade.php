@@ -4,20 +4,23 @@
     <meta charset="UTF-8">
     <title>@yield('title')</title>
     @php
-    $manifest = json_decode(
-        file_get_contents(public_path('build/manifest.json')),
-        true
-    );
+        $manifestPath = public_path('build/manifest.json');
 
-    $bundle = $manifest['resources/js/admin.js'];
+        if (!file_exists($manifestPath)) {
+            throw new Exception('Vite manifest not found');
+        }
+
+        $manifest = json_decode(file_get_contents($manifestPath), true);
+
+        $appjs = $manifest['resources/js/app.js'];
+        $appcss = $manifest['resouces/css/app.css']
     @endphp
 
-    @foreach ($bundle['css'] ?? [] as $css)
-        <link rel="stylesheet" href="{{ asset('build/' . $css) }}">
-    @endforeach
+    {{-- CSS --}}
+    <link rel="stylesheet" href="{{ asset('build/' . $appcss) }}">
 
-    <script src="{{ asset('build/' . $bundle['file']) }}" defer></script>
-
+    {{-- JS --}}
+    <script src="{{ asset('build/' . $appjs['file']) }}" defer></script>
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.0/dist/quill.snow.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.0/dist/quill.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
