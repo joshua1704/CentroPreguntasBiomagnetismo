@@ -30,6 +30,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
             }
         });
+
+        setupImageResize(quill);
     }
 
     // Carga button loading despues del submit
@@ -132,5 +134,74 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }, 50);
         };
+    }
+
+    function setupImageResize(quill) {
+        let resizer = null;
+        let activeImg = null;
+        let startX, startWidth;
+
+        quill.root.addEventListener('click', (e) => {
+            if (e.target.tagName === 'IMG') {
+            selectImage(e.target);
+            } else {
+            removeResizer();
+            }
+        });
+
+        function selectImage(img) {
+            activeImg = img;
+            removeResizer();
+
+            const rect = img.getBoundingClientRect();
+            const editorRect = quill.root.getBoundingClientRect();
+
+            resizer = document.createElement('div');
+            resizer.className = 'image-resizer';
+            resizer.style.left = rect.left - editorRect.left + quill.root.scrollLeft + 'px';
+            resizer.style.top = rect.top - editorRect.top + quill.root.scrollTop + 'px';
+            resizer.style.width = rect.width + 'px';
+            resizer.style.height = rect.height + 'px';
+
+            const handle = document.createElement('div');
+            handle.className = 'handle se';
+            resizer.appendChild(handle);
+
+            quill.root.parentElement.style.position = 'relative';
+            quill.root.parentElement.appendChild(resizer);
+
+            handle.addEventListener('mousedown', startResize);
+        }
+
+        function startResize(e) {
+            e.preventDefault();
+            startX = e.clientX;
+            startWidth = activeImg.offsetWidth;
+
+            document.addEventListener('mousemove', resize);
+            document.addEventListener('mouseup', stopResize);
+        }
+
+        function resize(e) {
+            const dx = e.clientX - startX;
+            const newWidth = Math.max(100, startWidth + dx); // mínimo 100px
+
+            activeImg.style.width = newWidth + 'px';
+
+            resizer.style.width = newWidth + 'px';
+            resizer.style.height = (activeImg.offsetHeight) + 'px';
+        }
+
+        function stopResize() {
+            document.removeEventListener('mousemove', resize);
+            document.removeEventListener('mouseup', stopResize);
+        }
+
+        function removeResizer() {
+            if (resizer) {
+                resizer.remove();
+                resizer = null;
+            }
+        }
     }
 });
