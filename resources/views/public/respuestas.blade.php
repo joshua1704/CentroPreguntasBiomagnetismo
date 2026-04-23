@@ -13,7 +13,7 @@
                             <h5 class="text-center">{{ __('answers.title') }}</h5>
                         </div>
                         <div class="col-1">
-                            <a href="{{ route('home') }}" class="btn btn-danger btn-sm">X</a>
+                            <a href="{{ route('home') }}" class="btn btn-danger btn-sm w-100">X</a>
                         </div>
                         <div class="col-10 col-md-6 offset-md-2 mb-1">
                             <input type="search" class="form-control form-control-sm" name="search" value="{{ $search }}" placeholder="Nombre o pregunta a buscar...">
