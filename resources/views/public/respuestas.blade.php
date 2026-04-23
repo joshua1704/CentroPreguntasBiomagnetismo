@@ -38,7 +38,8 @@
                                 <b>{{ __('answers.question_tag') }}</b> {{ $question->question }}
                             </p>
                             <p class="mb-1 text-primary">
-                                <b>{{ __('answers.answer_tag') }}</b> {!! $question->answer !!}
+                                <b>{{ __('answers.answer_tag') }}</b>
+                                <div class="ql-editor">{!! $question->answer !!}</div>
                             </p>
                         </li>
                     @endforeach
