@@ -18,7 +18,7 @@
     @endphp
 
     {{-- CSS --}}
-    <link rel="stylesheet" href="{{ asset('build/' . $appcss['file']) }}">
+    <link rel="stylesheet" href="{{ asset('build/' . $appcss['file']) }}" rel="stylesheet">
 
     {{-- JS --}}
     <script src="{{ asset('build/' . $appjs['file']) }}" defer></script>

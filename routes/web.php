@@ -7,11 +7,11 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function() {
-    view('public.home');
+    return view('public.home');
 })->name('home');
 
 Route::get('/formulario/preguntas', function() {
-    view('public.formulario');
+    return view('public.formulario');
 })->name('formulario_preguntas');
 
 Route::post('/crear/pregunta', [QuestionController::class, 'store'])->name('store_question');
