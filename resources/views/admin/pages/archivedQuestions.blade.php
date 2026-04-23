@@ -22,7 +22,9 @@
             <th scope="row" class="align-middle">{{ $question->id }}</th>
             <td class="align-middle">{{ $question->name }}</td>
             <td class="align-middle">{{ $question->question }}</td>
-            <td class="align-middle">{!! $question->answer !!}</td>
+            <td class="align-middle">
+                <div class="ql-editor">{!! $question->answer !!}</div>
+            </td>
             <td class="align-middle">{{ $question->topic }}</td>
             <td class="align-middle">{{ $question->created_at }}</td>
             <td class="align-middle">
