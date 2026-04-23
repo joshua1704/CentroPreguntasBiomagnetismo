@@ -13,7 +13,8 @@
         $manifest = json_decode(file_get_contents($manifestPath), true);
 
         $appjs = $manifest['resources/js/app.js'];
-        $appcss = $manifest['resouces/css/app.css']
+        $appcss = $manifest['resouces/css/app.css'];
+        dump($appcss);
     @endphp
 
     {{-- CSS --}}
