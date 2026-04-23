@@ -9,10 +9,10 @@
             <div class="card-header">
                 <form method="GET" action="{{ route('panel_respuestas') }}">
                     <div class="row">
-                        <div class="col-8 offset-2 mb-1">
+                        <div class="col-10 offset-1 mb-1">
                             <h5 class="text-center">{{ __('answers.title') }}</h5>
                         </div>
-                        <div class="col-2">
+                        <div class="col-1">
                             <a href="{{ route('home') }}" class="btn btn-danger btn-sm">X</a>
                         </div>
                         <div class="col-10 col-md-6 offset-md-2 mb-1">
