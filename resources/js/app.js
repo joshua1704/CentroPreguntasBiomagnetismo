@@ -184,7 +184,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         function resize(e) {
             const dx = e.clientX - startX;
-            const newWidth = Math.max(100, startWidth + dx); // mínimo 100px
+            const newWidth = Math.max(10, startWidth + dx); // mínimo 10px
 
             activeImg.style.width = newWidth + 'px';
 
