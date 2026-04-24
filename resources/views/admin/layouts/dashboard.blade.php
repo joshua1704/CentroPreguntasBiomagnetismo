@@ -7,7 +7,7 @@
             <div class="col-8 offset-2">
                 <h5 class="text-center">Panel de Administración</h5>
             </div>
-            <div class="col-2 align-items-end">
+            <div class="col-2 align-self-end">
                 <form method="POST" action="{{ route('admin_logout') }}" class="mb-1">
                     @csrf
                     <button type="submit" class="btn btn-danger btn-sm">
