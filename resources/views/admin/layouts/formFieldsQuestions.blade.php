@@ -33,7 +33,7 @@
                 <input class="form-control form-control-sm" type="search" placeholder="Texto a buscar" name="search" value="{{ $search_params['search'] ?? '' }}">
             </div>
         </div>
-        <div class="offset-3 col-6 col-md-6 offset-lg-0 col-lg-2 mb-3 mb-lg-0 align-content-end">
+        <div class="offset-3 col-6 offset-md-0 col-md-6 offset-lg-0 col-lg-2 mb-3 mb-lg-0 align-content-end">
             <button class="btn btn-primary btn-sm w-100" id="btnSearchParamsSubmit">Buscar</button>
             <button type="button" class="btn btn-primary btn-sm w-100 d-none" id="btnSearchParamsSpinner" disabled>
                 <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
