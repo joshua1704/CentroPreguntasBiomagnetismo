@@ -9,6 +9,7 @@
             </div>
             <div class="col-1 col-md-2">
                 <form method="POST" action="{{ route('admin_logout') }}">
+                    @csrf
                     <button type="submit" class="btn btn-danger btn-sm">
                         <span class="d-none d-md-inline-block">Cerrar sesión</span>
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-ban" viewBox="0 0 16 16">
