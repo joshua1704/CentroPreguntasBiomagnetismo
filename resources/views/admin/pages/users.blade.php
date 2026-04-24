@@ -27,7 +27,7 @@
             <td class="align-middle">{{ $user->name }}</td>
             <td class="align-middle">{{ $user->username }}</td>
             <td class="align-middle">{{ $user->created_at }}</td>
-            <td class="align.middle"></td>
+            <td class="align.middle">{{ $user->is_admin }}</td>
             <td class="align-middle">
                 <div class="d-flex justify-content-center">
                     <a href="#" class="btn btn-secondary btn-sm me-2" title="Bloquear acceso">
