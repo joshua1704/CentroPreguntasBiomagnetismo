@@ -10,6 +10,19 @@
     --bs-dropdown-zindex: 1500;
 }
 
+.card {
+  overflow: visible;
+}
+
+.card-header {
+  position: relative;
+  z-index: 3000;
+}
+
+thead.sticky-top {
+  z-index: 1020; /* default, NO subir más */
+}
+
 .dropdown-menu {
     z-index: var(--bs-dropdown-zindex) !important;
 }
