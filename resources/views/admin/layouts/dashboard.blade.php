@@ -17,7 +17,7 @@
                     </button>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="#">Action</a></li>
-                        <li><a class="dropdown-item" href="#">Another action</a></li>
+                        <li><a class="dropdown-item" href="#">Cambiar contraseña</a>
                         <li>
                             <form method="POST" action="{{ route('admin_logout') }}" class="mb-1 text-end">
                                 @csrf
