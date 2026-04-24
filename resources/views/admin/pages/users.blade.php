@@ -81,7 +81,7 @@
 <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="POST" action="{{ route('admin_user_store') }}">
+            <form method="POST" action="{{ route('admin_user_store') }}" id="newUserForm">
                 @csrf
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="staticBackdropLabel">Nuevo usuario</h1>
@@ -117,13 +117,25 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <button type="submit" class="btn btn-primary btn-sm" id="btnNewUserFormSubmit">Guardar</button>
+                    <button type="button" class="btn btn-primary btn-sm mt-3 d-none" id="btnNewUserFormSpinner" disabled>
+                        <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                        <span role="status">Guardando...</span>
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let topicForm = document.querySelector('#newUserForm');
+        topicForm.addEventListener('submit', function() {
+            document.querySelector('#btnNewUserFormSubmit').classList.add('d-none');
+            document.querySelector('#btnNewUserFormSpinner').classList.remove('d-none');
+        });
+    });
+</script>
 @if ($errors->any())
     <script>
         document.addEventListener('DOMContentLoaded', function() {
