@@ -12,7 +12,7 @@
         </tr>
     </thead>
 </table>
-<div class="overflow-y-scroll" style="height: calc(100vh - 160px);">
+<div class="overflow-y-scroll height_calc">
     <table class="table table-sm border">
         <thead class="table-light sticky-top border">
             <tr>

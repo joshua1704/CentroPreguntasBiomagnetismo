@@ -165,16 +165,13 @@ thead.sticky-top {
 ========================= */
 
 @media (max-width: 575px) {
-    .buttons-home {
-        gap: 32px;
-    }
-    .btn-home {
-        font-size: 12px;
-    }
+    .buttons-home { gap: 32px; }
+    .btn-home   { font-size: 12px; }
     .w-sm-100   { width: 100% !important; }
     .w-sm-75    { width:  75% !important; }
     .w-sm-50    { width:  50% !important; }
     .w-sm-25    { width:  25% !important; }
+    .height_calc { height: calc(100vh - 160px); }
 }
 
 /* =========================
@@ -182,30 +179,26 @@ thead.sticky-top {
 ========================= */
 
 @media (min-width: 576px) and (max-width: 991px) {
-    .buttons-home {
-        gap: 48px;
-    }
-    .btn-home {
-        font-size: 14px;
-    }
+    .buttons-home { gap: 48px; }
+    .btn-home   { font-size: 14px; }
     .w-md-100   { width: 100% !important; }
     .w-md-75    { width:  75% !important; }
     .w-md-50    { width:  50% !important; }
     .w-md-25    { width:  25% !important; }
+    .height_calc { height: calc(100vh - 140px); }
+
 }
 
 /* =========================
    Responsive Desktop
 ========================= */
 @media (min-width: 992px) {
-    .buttons-home {
-        gap: 64px;
-    }
-    .btn-home {
-        font-size: 18px;
-    }
+    .buttons-home { gap: 64px; }
+    .btn-home   { font-size: 18px; }
     .w-lg-100   { width: 100% !important; }
     .w-lg-75    { width:  75% !important; }
     .w-lg-50    { width:  50% !important; }
     .w-lg-25    { width:  25% !important; }
+    .height_calc { height: calc(100vh - 120px); }
+
 }
