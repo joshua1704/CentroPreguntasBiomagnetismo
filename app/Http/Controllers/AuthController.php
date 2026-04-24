@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
@@ -55,15 +56,50 @@ class AuthController extends Controller
     }
 
     public function changePassword(Request $request) {
-        $request->validate([
-            'password' => 'required|min:8|confirmed',
+        $validator = Validator::make($request->all(), [
+            'password' => [
+                'required',
+                'confirmed',
+                'min:8',
+                function($attribute, $value, $fail) {
+                    // letters (al menos una letra)
+                    if (!preg_match('/[a-zA-Z]/', $value)) {
+                        $fail(__('validator.password_letters'));
+                    }
+
+                    // mixedCase (mayúsculas y minúsculas)
+                    if (!preg_match('/[A-Z]/', $value) || !preg_match('/[a-z]/', $value)) {
+                        $fail(__('validator.password_mixedcase'));
+                    }
+
+                    // numbers
+                    if (!preg_match('/[0-9]/', $value)) {
+                        $fail(__('validator.password_numbers'));
+                    }
+
+                    // symbols
+                    if (!preg_match('/[\W_]/', $value)) {
+                        $fail(__('validator.password_symbols'));
+                    }
+                }
+            ]
+        ], [
+            'password.required' => __('validator.password_required'),
+            'password.confirmed' => __('validator.password_confirmed'),
+            'password.min' => __('validator.password_min')
         ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
 
         $user = auth()->user();
         $user->password = Hash::make($request->password);
         $user->must_change_password = false;
         $user->save();
 
-        return redirect('/dashboard');
+        return redirect()->route('admin_get_questions');
     }
 }
