@@ -1,6 +1,6 @@
 @extends('admin.layouts.dashboard')
 @section('panel')
-<div class="container bg-light py-1 rounded mb-1 border">
+<div class="container bg-light py-1 rounded mb-1 border mx-0">
     @yield('header')
 </div>
 <table class="table table-sm border m-0">
