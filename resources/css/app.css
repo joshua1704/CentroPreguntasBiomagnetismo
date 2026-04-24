@@ -16,7 +16,6 @@
 
 .card-header {
   position: relative;
-  z-index: 3000;
 }
 
 thead.sticky-top {
