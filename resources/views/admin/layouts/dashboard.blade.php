@@ -8,7 +8,7 @@
                 <h5 class="text-center">Panel de Administración</h5>
             </div>
             <div class="col-2 align-self-end">
-                <form method="POST" action="{{ route('admin_logout') }}" class="mb-1">
+                <form method="POST" action="{{ route('admin_logout') }}" class="mb-1 text-end">
                     @csrf
                     <button type="submit" class="btn btn-danger btn-sm">
                         <svg class="me-1" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-left" viewBox="0 0 16 16">
