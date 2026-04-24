@@ -65,8 +65,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary" id="btnNewTopicFormSubmit">Guardar</button>
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary btn-sm" id="btnNewTopicFormSubmit">Guardar</button>
                     <button type="button" class="btn btn-primary btn-sm mt-3 d-none" id="btnNewTopicFormSpinner" disabled>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
                         <span role="status">Guardando...</span>
