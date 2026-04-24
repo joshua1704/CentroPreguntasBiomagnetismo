@@ -16,6 +16,7 @@
         <th scope="col">Nombre</th>
         <th scope="col">Usuario</th>
         <th scope="col">Creación</th>
+        <th scope="col">Acceso</th>
         <th scope="col" class="text-center">Accciones</th>
     </tr>
 @endsection
@@ -26,6 +27,7 @@
             <td class="align-middle">{{ $user->name }}</td>
             <td class="align-middle">{{ $user->username }}</td>
             <td class="align-middle">{{ $user->created_at }}</td>
+            <td class="align.middle"></td>
             <td class="align-middle">
                 <div class="d-flex justify-content-center">
                     <a href="#" class="btn btn-secondary btn-sm me-2" title="Bloquear acceso">
