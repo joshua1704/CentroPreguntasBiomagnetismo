@@ -2,9 +2,8 @@
     <div class="row">
         <div class="col-lg-2 col-12 mb-3 mb-lg-0">
             <div class="d-flex d-lg-block align-items-center gap-2">
-                <label class="form-label" for="inputSelectTopics">Filtrar:</label>
                 <select class="form-select form-select-sm" id="inputSelectTopics" name="topic">
-                    <option value="">Todos</option>
+                    <option value="">Todos los temas</option>
                     @foreach ($topics as $topic)
                         <option value="{{ $topic->id }}" {{ ($search_params['topic'] ?? '') == $topic->id ? 'selected' : '' }}>{{ $topic->name }}</option>
                     @endforeach
@@ -13,10 +12,8 @@
         </div>
         <div class="col-12 col-lg-4 mb-3 mb-3 mb-lg-0">
             <div class="d-flex d-lg-block align-items-center gap-2">
-
-                <label class="form-label" for="inputSelectDate">Fecha:</label>
                 <select class="form-select form-select-sm {{ ($search_params['date'] ?? '') == 'custome_range' ? 'd-none' : '' }}" id="inputSelectDate" name="date">
-                    <option value="">Todos</option>
+                    <option value="">Todas las fechas</option>
                     <option value="today" {{ ($search_params['date'] ?? '') == 'today' ? 'selected' : '' }}>Hoy</option>
                     <option value="week" {{ ($search_params['date'] ?? '') == 'week' ? 'selected' : '' }}>Una semana</option>
                     <option value="month" {{ ($search_params['date'] ?? '') == 'month' ? 'selected' : '' }}>Un mes</option>
@@ -33,7 +30,6 @@
         </div>
         <div class="col-12 col-lg-4 mb-3 mb-lg-0">
             <div class="d-flex d-lg-block align-items-center gap-2">
-                <label class="form-label" for="inputSelectDate">Búsqueda:</label>
                 <input class="form-control form-control-sm" type="search" placeholder="Texto a buscar" name="search" value="{{ $search_params['search'] ?? '' }}">
             </div>
         </div>
