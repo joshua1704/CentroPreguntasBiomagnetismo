@@ -16,7 +16,16 @@ class TopicController extends Controller
 
     public function store(Request $request) {
         $request->validate([
+            'name' => 'required|unique:topics,name'
+        ], [
+            'name.required' => '',
+            'name.unique' => ''
+        ]);
 
+        DB::table('topics')->insert([
+            'name' => $request->name,
+            'created_at' => now(),
+            'updated_at' => now()
         ]);
     }
 }

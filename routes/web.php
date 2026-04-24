@@ -33,6 +33,7 @@ Route::prefix('admin')->name('admin_')->group(function() {
         Route::post('/user/store', [UserController::class, 'store'])->name('user_store');
         Route::post('/user/access', [UserController::class, 'accessControl'])->name('user_access');
         Route::get('/topics', [TopicController::class, 'index'])->name('topics');
+        Route::get('/topic/store', [TopicController::class, 'store'])->name('topic_store');
         Route::post('/pregunta/modificar', [QuestionController::class, 'update'])->name('update_question');
         Route::post('/upload_image', [QuestionController::class, 'uploadImage']);
         Route::get('/change_password', [AuthController::class, 'showChangePassword'])->name('change_password');

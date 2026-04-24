@@ -1,6 +1,6 @@
 @extends('admin.layouts.panel')
 @section('header')
-    <button class="btn btn-primary btn-sm">
+    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
         <span>Nuevo</span>
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
             <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
@@ -38,25 +38,58 @@
     @endforeach
 @endsection
 <!-- Modal -->
-    <div class="modal fade show" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form method="POST" action="#">
-                    <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="staticBackdropLabel">Nuevo tema
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="exampleFormControlInput1" class="form-label">Nombre:</label>
-                            <input type="text" class="form-control" id="exampleFormControlInput1" name="name" required>
+<div class="modal fade show" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ route('admin_topic_store') }}" id="newTopicForm">
+                @csrf
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Nuevo tema
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @if ($errors->any())
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong>Errores!</strong>
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
+                    @endif
+                    <div class="mb-3">
+                        <label for="exampleFormControlInput1" class="form-label">Nombre:</label>
+                        <input type="text" class="form-control" id="exampleFormControlInput1" name="name" required>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Guardar</button>
-                    </div>
-                </form>
-            </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" id="btnNewTopicFormSubmit">Guardar</button>
+                    <button type="button" class="btn btn-primary btn-sm mt-3 d-none" id="btnNewTopicFormSpinner" disabled>
+                        <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                        <span role="status">Guardando...</span>
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let topicForm = document.querySelector('#newTopicForm');
+        topicForm.addEventListener('submit', function() {
+            document.querySelector('#btnNewTopicFormSubmit').classList.add('d-none');
+            document.querySelector('#btnNewTopicFormSpinner').classList.remove('d-none');
+        });
+    });
+</script>
+@if ($errors->any())
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var modal = new bootstrap.Modal(document.getElementById('staticBackdrop'));
+            modal.show();
+        });
+    </script>
+@endif
