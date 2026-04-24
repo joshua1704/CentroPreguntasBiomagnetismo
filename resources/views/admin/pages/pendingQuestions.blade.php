@@ -18,12 +18,12 @@
 @section('body_table')
     @foreach ($questions as $question)
         <tr>
-            <th scope="row" class="align-middle">{{ $question->id }}</th>
-            <td class="align-middle">{{ $question->name }}</td>
-            <td class="align-middle">{{ $question->question }}</td>
-            <td class="align-middle">{{ $question->topic }}</td>
-            <td class="align-middle">{{ $question->created_at }}</td>
-            <td class="align-middle">
+            <th scope="row" class="align-top">{{ $question->id }}</th>
+            <td class="align-top">{{ $question->name }}</td>
+            <td class="align-top">{{ $question->question }}</td>
+            <td class="align-top">{{ $question->topic }}</td>
+            <td class="align-top">{{ $question->created_at }}</td>
+            <td class="align-top">
                 <div class="d-flex justify-content-center">
                     <a href="{{ route('admin_edit_question', [$question->id, 'pending']) }}" class="btn btn-warning btn-sm me-2" title="Editar">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
