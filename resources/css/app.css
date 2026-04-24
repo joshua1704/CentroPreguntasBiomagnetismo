@@ -7,6 +7,11 @@
     --bs-primary: #2f5f8f;
     --bs-link-color: #2f5f8f;
     --bs-link-hover-color: #244a6d;
+    --bs-dropdown-zindex: 1500;
+}
+
+.dropdown-menu {
+    z-index: var(--bs-dropdown-zindex) !important;
 }
 
 .text-primary {
