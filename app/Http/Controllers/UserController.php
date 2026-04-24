@@ -49,7 +49,7 @@ class UserController extends Controller
                 }
             ]
         ], [
-            'name.required' => __('validator.name_requiered'),
+            'name.required' => __('validator.name_required'),
             'name.string' => __('validator.name_string'),
             'username.required' => __('validator.username_required'),
             'username.unique' => __('validator.username_unique'),

@@ -23,7 +23,7 @@ class QuestionController extends Controller
                 'question' => 'required'
             ],
             [
-                'name.required' => __('validator.name_requiered'),
+                'name.required' => __('validator.name_required'),
                 'name.string' => __('validator.name_string'),
                 'question.required' => __('validator.question_required'),
             ]
@@ -53,7 +53,7 @@ class QuestionController extends Controller
         ],
         [
             'id.required' => __('validator.id_required'),
-            'name.required' => __('validator.name_requiered'),
+            'name.required' => __('validator.name_required'),
             'question.required' => __('validator.question_required'),
             'topic_id.required' => __('validator.topic_id_required')
         ]);

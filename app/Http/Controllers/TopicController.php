@@ -18,8 +18,8 @@ class TopicController extends Controller
         $request->validate([
             'name' => 'required|unique:topics,name'
         ], [
-            'name.required' => '',
-            'name.unique' => ''
+            'name.required' => __('validator.name_required'),
+            'name.unique' => __('validator.name_unique')
         ]);
 
         DB::table('topics')->insert([
@@ -27,5 +27,7 @@ class TopicController extends Controller
             'created_at' => now(),
             'updated_at' => now()
         ]);
+
+        return redirect()->back();
     }
 }

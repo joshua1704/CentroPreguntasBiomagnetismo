@@ -1,10 +1,14 @@
 <?php
 return [
-    'name_requiered' => 'El nombre es obligatorio.',
+    'name_required' => 'El nombre es obligatorio.',
     'name_string' => 'El nombre debe ser texto.',
+    'name_unique' => 'El nombre ya existe.',
     'question_required' => 'La pregunta es obligatoria.',
     'success_question' => 'Pregunta enviada correctamente con ID: ',
+    'success_updated' => 'Actualizado correctamente.',
     'error_question' => 'Hubo un error inesperado al intentar enviar la pregunta.',
+    'error_not_find_register' => 'Registro no encontrado.',
+    'error_update_question' => 'Hubo un error inesperado al intentar actualizar la pregunta',
     'username_required' => 'El usuario es obligatorio.',
     'username_unique' => 'El nombre de usuario ya existe.',
     'password_required' => 'La contraseña es obligatoria.',
@@ -13,12 +17,9 @@ return [
     'password_mixedcase' => 'La contraseña debe incluir mayúsculas y minúsculas.',
     'password_numbers' => 'La contraseña debe contener al menos un número.',
     'password_symbols' => 'La contraseña debe contener al menos un símbolo.',
+    'password_min' => 'La contraseña debe tener al menos 8 caracteres.',
     'id_required' => 'El id es obligatorio.',
     'topic_id_required' => 'El topic_id es obligatorio.',
-    'error_not_find_register' => 'Registro no encontrado.',
-    'success_updated' => 'Actualizado correctamente.',
-    'error_update_question' => 'Hubo un error inesperado al intentar actualizar la pregunta',
-    'password_min' => 'La contraseña debe tener al menos 8 caracteres.',
     'login_not_attempt' => 'Credenciales incorrectas.',
     'login_not_access' => 'Usuario sin acceso.'
 ];
