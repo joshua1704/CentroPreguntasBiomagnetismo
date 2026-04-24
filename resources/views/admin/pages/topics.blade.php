@@ -23,7 +23,7 @@
         <tr>
             <th scope="row" class="align-middle">{{ $topic->id }}</th>
             <td class="align-middle text-center">{{ $topic->name }}</td>
-            <td class="align-middle text-center">{{ \Carbon\Carbon::parse($topic->created_at)->locale(app()->getLocale())->diffForHumans() }}</td>
+            <td class="align-middle text-center">{{ $topic->created_at }}</td>
             <td class="align-middle">
                 <div class="d-flex justify-content-center">
                     <a href="#" class="btn btn-warning btn-sm me-2" title="Editar">
