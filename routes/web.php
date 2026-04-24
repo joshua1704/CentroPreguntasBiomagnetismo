@@ -25,7 +25,7 @@ Route::prefix('admin')->name('admin_')->group(function() {
     Route::post('/login', [AuthController::class, 'login'])->name('login');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    Route::middleware(['auth', 'force.password'])->group(function() {
+    Route::middleware('auth')->group(function() {
         Route::get('/preguntas/{sidebar}', [QuestionController::class, 'getQuestions'])->name('get_questions');
         Route::get('/editar/pregunta/{id}/{sidebar}', [QuestionController::class, 'showEdit'])->name('edit_question');
         Route::get('/cambia/status/pregunta/{id}/{status}', [QuestionController::class, 'changeStatusQuestion'])->name('change_status_question');

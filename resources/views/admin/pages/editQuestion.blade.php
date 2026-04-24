@@ -4,7 +4,7 @@
         <div class="card-header">
             <div class="row">
                 <div class="col-8">
-                    <h6>Pregunta número {{ $question->id }}</h6>
+                    <h6> {{ __('editQuestionForm.title') . ' ' . $question->id }}</h6>
                 </div>
                 <div class="col-4 text-end">
                     @php
@@ -64,7 +64,7 @@
             @endif
             @if (session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <strong>Exitoso!</strong> {{ session('success') }}
+                    <strong>{{ __('editQuestionForm.success_alert_title') }}</strong> {{ session('success') }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
@@ -72,15 +72,15 @@
                 @csrf
                 <input type="hidden" value="{{ $question->id }}" name="id">
                 <div class="mb-3">
-                    <label for="InputName" class="form-label fw-bold">Nombre</label>
+                    <label for="InputName" class="form-label fw-bold">{{ __('editQuestionForm.name_tag') }}</label>
                     <input type="text" class="form-control form-control-sm" id="ModalQPInputName" name="name" value="{{ $question->name }}">
                 </div>
                 <div class="mb-3">
-                    <label for="InputQuestion" class="form-label fw-bold">Pregunta</label>
+                    <label for="InputQuestion" class="form-label fw-bold">{{ __('editQuestionForm.question_tag') }}</label>
                     <input type="text" class="form-control form-control-sm" id="ModalQPInputQuestion" name="question" value="{{ $question->question }}">
                 </div>
                 <div class="mb-3">
-                    <label for="InputTopic" class="form-label fw-bold" id="ModalQPInputTopic">Tema</label>
+                    <label for="InputTopic" class="form-label fw-bold" id="ModalQPInputTopic">{{ __('editQuestionForm.topic_tag') }}</label>
                     <select class="form-select form-select-sm" aria-label="InputTopic" name="topic_id">
                         @foreach ($topics as $topic)
                             <option value="{{ $topic->id }}" {{ $topic->id == $question->topic_id ? 'selected' : '' }}>{{ $topic->name }}</option>
@@ -88,15 +88,15 @@
                     </select>
                 </div>
                 <div class="mb-3">
-                    <label for="InputAnswer" class="form-label fw-bold">Respuesta</label>
+                    <label for="InputAnswer" class="form-label fw-bold">{{ __('editQuestionForm.answer_tag') }}</label>
                     <div id="editor" style="height: 200px;"></div>
                     <input type="hidden" name="answer" id="content" value="{{ $question->answer }}">
                 </div>
                 <div class="d-grid col-4 mx-auto">
-                    <button type="submit" class="btn btn-primary btn-sm mt-3" id="btnEditQuestionFormSubmit">Guardar</button>
+                    <button type="submit" class="btn btn-primary btn-sm mt-3" id="btnEditQuestionFormSubmit">{{ __('editQuestionForm.btn_submit') }}</button>
                     <button type="button" class="btn btn-primary btn-sm mt-3 d-none" id="btnEditQuestionFormSpinner" disabled>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
-                        <span role="status">Guardando...</span>
+                        <span role="status">{{ __('editQuestionForm.btn_spinner') }}</span>
                     </button>
                 </div>
             </form>

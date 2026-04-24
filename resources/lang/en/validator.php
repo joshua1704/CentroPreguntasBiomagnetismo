@@ -2,7 +2,7 @@
 return [
     'name_required' => 'Name is required',
     'name_string' => 'The name must be text',
-    'name_unique' => '',
+    'name_unique' => 'The name already exists.',
     'question_required' => 'Question is required',
     'success_question' => 'Question submitted successfully with ID: ',
     'success_updated' => 'Updated successfully.',
@@ -20,6 +20,6 @@ return [
     'error_not_find_register' => 'Record not found.',
     'error_update_question' => 'An unexpected error occurred while trying to update the question.',
     'error_question' => 'An unexpected error occurred while trying to submit the question',
-    'login_not_attempt' => '',
-    'login_not_access' => ''
+    'login_not_attempt' => 'Invalid credentials.',
+    'login_not_access' => 'User doesn’t have access'
 ];
