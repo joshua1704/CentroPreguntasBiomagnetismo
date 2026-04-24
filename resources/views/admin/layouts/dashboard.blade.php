@@ -7,8 +7,8 @@
             <div class="col-8 offset-2">
                 <h5 class="text-center">Panel de Administración</h5>
             </div>
-            <div class="col-2 align-self-end">
-                <div class="dropdown">
+            <div class="col-2">
+                <div class="dropdown text-end">
                     <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
                             <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
