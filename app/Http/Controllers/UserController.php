@@ -76,4 +76,14 @@ class UserController extends Controller
 
         return redirect()->back();
     }
+
+    public function accessControl(Request $request) {
+        if ($request->filled('id') && $request->filled('access')) {
+            $user = User::findOrFail($request->id);
+            $user->is_admin = $request->access;
+            $user->save();
+        }
+
+        return redirect()->back();
+    }
 }

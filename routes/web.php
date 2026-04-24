@@ -31,6 +31,7 @@ Route::prefix('admin')->name('admin_')->group(function() {
         Route::get('/cambia/status/pregunta/{id}/{status}', [QuestionController::class, 'changeStatusQuestion'])->name('change_status_question');
         Route::get('/users', [UserController::class, 'index'])->name('users');
         Route::post('/user/store', [UserController::class, 'store'])->name('user_store');
+        Route::post('/user/access', [UserController::class, 'accessControl'])->name('user_access');
         Route::get('/topics', [TopicController::class, 'index'])->name('topics');
         Route::post('/pregunta/modificar', [QuestionController::class, 'update'])->name('update_question');
         Route::post('/upload_image', [QuestionController::class, 'uploadImage']);
