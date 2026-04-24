@@ -32,10 +32,6 @@ class AuthController extends Controller
                 ]);
             }
 
-            if($user->must_change_password) {
-                return redirect('/admin/change_password');
-            }
-
             return redirect()->route('admin_get_questions', 'pending');
         }
 
