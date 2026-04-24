@@ -10,7 +10,7 @@
                 @error('login')
                     <div class="alert alert-danger" role="alert">{{ $message }}</div>
                 @enderror
-                <form method="POST" action="#">
+                <form method="POST" action="{{ route('admin_login') }}">
                     @csrf
 
                     <div class="mb-3">

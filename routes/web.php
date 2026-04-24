@@ -23,8 +23,8 @@ Route::prefix('admin')->name('admin_')->group(function() {
     });
 
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [AuthController::class, 'login']);
-    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/login', [AuthController::class, 'login'])->name('login');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/change_password', [AuthController::class, 'showChangePassword'])->name('change_password');
     Route::post('/change_password', [AuthController::class, 'changePassword']);
 
