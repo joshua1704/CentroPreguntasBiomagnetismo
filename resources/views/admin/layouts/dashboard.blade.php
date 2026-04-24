@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', 'Dashboard')
 @section('content')
-<div class="card w-100" style="height: 100vh;">
+<div class="card w-100" style="height: 100vh;z-index: 3000;">
     <div class="card-header pb-0">
         <div class="row">
             <div class="col-8 offset-2">
@@ -15,7 +15,7 @@
                             <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
                         </svg>
                     </button>
-                    <ul class="dropdown-menu" style="z-index: 3000;">
+                    <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="#">Action</a></li>
                         <li><a class="dropdown-item" href="#">Another action</a></li>
                         <li>
