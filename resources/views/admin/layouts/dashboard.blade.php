@@ -1,8 +1,8 @@
 @extends('layouts.app')
 @section('title', 'Dashboard')
 @section('content')
-<div class="card w-100" style="height: 100vh;z-index: 3000;">
-    <div class="card-header pb-0">
+<div class="card w-100" style="height: 100vh;">
+    <div class="card-header pb-0" style="z-index: 3000;">
         <div class="row">
             <div class="col-8 offset-2">
                 <h5 class="text-center">Panel de Administración</h5>
