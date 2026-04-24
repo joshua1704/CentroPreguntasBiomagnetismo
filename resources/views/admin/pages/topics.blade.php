@@ -13,17 +13,17 @@
 @section('headers_table')
     <tr>
         <th scope="col">#</th>
-        <th scope="col">Nombre</th>
-        <th scope="col">Creación</th>
-        <th scope="col">Accciones</th>
+        <th scope="col" class="text-center">Nombre</th>
+        <th scope="col" class="text-center">Creación</th>
+        <th scope="col" class="text-center">Accciones</th>
     </tr>
 @endsection
 @section('body_table')
     @foreach ($topics as $topic)
         <tr>
             <th scope="row" class="align-middle">{{ $topic->id }}</th>
-            <td class="align-middle">{{ $topic->name }}</td>
-            <td class="align-middle">{{ $topic->created_at }}</td>
+            <td class="align-middle text-center">{{ $topic->name }}</td>
+            <td class="align-middle text-center">{{ $topic->created_at }}</td>
             <td class="align-middle">
                 <div class="d-flex justify-content-center">
                     <a href="#" class="btn btn-warning btn-sm me-2" title="Editar">
