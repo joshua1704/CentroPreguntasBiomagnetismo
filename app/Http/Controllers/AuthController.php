@@ -100,6 +100,6 @@ class AuthController extends Controller
         $user->must_change_password = false;
         $user->save();
 
-        return redirect()->route('admin_get_questions');
+        return redirect()->route('admin_get_questions', 'pending');
     }
 }
