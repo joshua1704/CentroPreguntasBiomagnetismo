@@ -13,10 +13,10 @@
 @section('headers_table')
     <tr>
         <th scope="col">#</th>
-        <th scope="col">Nombre</th>
-        <th scope="col">Usuario</th>
-        <th scope="col">Creación</th>
-        <th scope="col">Acceso</th>
+        <th scope="col" class="text-center">Nombre</th>
+        <th scope="col" class="text-center">Usuario</th>
+        <th scope="col" class="text-center">Creación</th>
+        <th scope="col" class="text-center">Acceso</th>
         <th scope="col" class="text-center">Accciones</th>
     </tr>
 @endsection
@@ -24,10 +24,10 @@
     @foreach ($users as $user)
         <tr>
             <th scope="row" class="align-middle">{{ $user->id }}</th>
-            <td class="align-middle">{{ $user->name }}</td>
-            <td class="align-middle">{{ $user->username }}</td>
-            <td class="align-middle">{{ $user->created_at }}</td>
-            <td class="align.middle">
+            <td class="align-middle text-center">{{ $user->name }}</td>
+            <td class="align-middle text-center">{{ $user->username }}</td>
+            <td class="align-middle text-center">{{ $user->created_at }}</td>
+            <td class="align.middle text-center">
                 @if ($user->is_admin == 1)
                     <span class="badge text-bg-success">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle" viewBox="0 0 16 16">
