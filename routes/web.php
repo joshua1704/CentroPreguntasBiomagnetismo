@@ -37,6 +37,6 @@ Route::prefix('admin')->name('admin_')->group(function() {
         Route::post('/pregunta/modificar', [QuestionController::class, 'update'])->name('update_question');
         Route::post('/upload_image', [QuestionController::class, 'uploadImage']);
         Route::get('/change_password', [AuthController::class, 'showChangePassword'])->name('change_password');
-        Route::post('/change_password', [AuthController::class, 'changePassword']);
+        Route::post('/change_password', [AuthController::class, 'changePassword'])->name('change_password');
     });
 });
