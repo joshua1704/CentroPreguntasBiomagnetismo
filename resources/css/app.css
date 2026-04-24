@@ -171,7 +171,7 @@ thead.sticky-top {
     .w-sm-75    { width:  75% !important; }
     .w-sm-50    { width:  50% !important; }
     .w-sm-25    { width:  25% !important; }
-    .height_calc { height: calc(100vh - 160px); }
+    .height_calc { height: calc(100vh - 170px); }
 }
 
 /* =========================
@@ -185,7 +185,7 @@ thead.sticky-top {
     .w-md-75    { width:  75% !important; }
     .w-md-50    { width:  50% !important; }
     .w-md-25    { width:  25% !important; }
-    .height_calc { height: calc(100vh - 140px); }
+    .height_calc { height: calc(100vh - 150px); }
 
 }
 
@@ -199,6 +199,6 @@ thead.sticky-top {
     .w-lg-75    { width:  75% !important; }
     .w-lg-50    { width:  50% !important; }
     .w-lg-25    { width:  25% !important; }
-    .height_calc { height: calc(100vh - 120px); }
+    .height_calc { height: calc(100vh - 130px); }
 
 }
