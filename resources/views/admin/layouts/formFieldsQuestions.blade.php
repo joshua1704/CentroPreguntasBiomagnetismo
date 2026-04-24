@@ -1,6 +1,6 @@
 <div class="d-none d-md-block">
     <div class="row">
-        <div class="col-lg-2 col-12 mb-3 mb-lg-0">
+        <div class="col-lg-3 col-12 mb-3 mb-lg-0">
             <div class="d-flex d-lg-block align-items-center gap-2">
                 <select class="form-select form-select-sm" id="inputSelectTopics" name="topic">
                     <option value="">Todos los temas</option>
@@ -28,7 +28,7 @@
 
             </div>
         </div>
-        <div class="col-12 col-lg-4 mb-3 mb-lg-0">
+        <div class="col-12 col-lg-3 mb-3 mb-lg-0">
             <div class="d-flex d-lg-block align-items-center gap-2">
                 <input class="form-control form-control-sm" type="search" placeholder="Texto a buscar" name="search" value="{{ $search_params['search'] ?? '' }}">
             </div>
