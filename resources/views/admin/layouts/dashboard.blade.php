@@ -25,7 +25,7 @@
                             </a>
                         </li>
                         <li>
-                            <form method="POST" action="{{ route('admin_logout') }}" class="mb-1 text-end">
+                            <form method="POST" action="{{ route('admin_logout') }}">
                                 @csrf
                                 <button type="submit" class="dropdown-item">
                                     <svg class="me-1" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-box-arrow-left" viewBox="0 0 16 16">
