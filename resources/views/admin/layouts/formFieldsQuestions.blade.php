@@ -1,4 +1,4 @@
-<div class="row d-none d-md-block">
+<div class="row d-none d-md-inline-block">
     <div class="col-lg-2 col-12 mb-3 mb-lg-0">
         <div class="d-flex d-lg-block align-items-center gap-2">
             <label class="form-label" for="inputSelectTopics">Filtrar:</label>
