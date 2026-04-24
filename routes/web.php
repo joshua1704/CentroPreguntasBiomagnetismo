@@ -21,12 +21,12 @@ Route::prefix('admin')->name('admin_')->group(function() {
     Route::get('/', function() {
         return redirect()->route('admin_login');
     });
+    Route::middleware('guest')->group(function () {
+        Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+        Route::post('/login', [AuthController::class, 'login'])->name('login');
+    });
 
-    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [AuthController::class, 'login'])->name('login');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    Route::get('/change_password', [AuthController::class, 'showChangePassword'])->name('change_password');
-    Route::post('/change_password', [AuthController::class, 'changePassword']);
 
     Route::middleware(['auth', 'force.password'])->group(function() {
         Route::get('/preguntas/{sidebar}', [QuestionController::class, 'getQuestions'])->name('get_questions');
@@ -37,5 +37,7 @@ Route::prefix('admin')->name('admin_')->group(function() {
         Route::get('/topics', [TopicController::class, 'index'])->name('topics');
         Route::post('/pregunta/modificar', [QuestionController::class, 'update'])->name('update_question');
         Route::post('/upload_image', [QuestionController::class, 'uploadImage']);
+        Route::get('/change_password', [AuthController::class, 'showChangePassword'])->name('change_password');
+        Route::post('/change_password', [AuthController::class, 'changePassword']);
     });
 });
