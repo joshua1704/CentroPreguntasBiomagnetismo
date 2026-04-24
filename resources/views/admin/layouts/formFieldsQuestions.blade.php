@@ -44,8 +44,8 @@
         </button>
     </div>
 </div>
-<div class="d-flex d-md-none align-items-end">
-    <button type="button" class="btn btn-outline-primary btn-sm" id="btnOpenFormFieldsQuestions">
+<div class="d-flex d-md-none justify-content-center">
+    <button type="button" class="btn btn-outline-secondary btn-sm" id="btnOpenFormFieldsQuestions">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-caret-down-fill" viewBox="0 0 16 16">
             <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
         </svg>
