@@ -19,15 +19,20 @@ class AuthController extends Controller
         ]);
 
         if(Auth::attempt($credentials)) {
-            if (auth()->user()->is_admin) {
-                return back()->withErrors([
+            $request->session()->regenerate();
+
+            $user = auth()->user();
+
+            if (!$user->is_admin) {
+                Auth::logout();
+                return redirect()
+                    ->route('admin_login')
+                    ->withErrors([
                     'login' => __('validator.login_not_access'),
                 ]);
             }
 
-            $request->session()->regenerate();
-
-            if(auth()->user()->must_change_password) {
+            if($user->must_change_password) {
                 return redirect('/admin/change_password');
             }
 
