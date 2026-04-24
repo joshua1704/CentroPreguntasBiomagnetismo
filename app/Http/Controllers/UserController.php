@@ -13,7 +13,7 @@ class UserController extends Controller
     public function index() {
         $sidebar = "users";
         $users = DB::table('users')
-            ->select('users.id', 'users.name', 'users.username', 'users.created_at')
+            ->select('users.id', 'users.name', 'users.username', 'users.created_at', 'users.is_admin')
             ->get();
         return view('admin.pages.users', compact('sidebar', 'users'));
     }
