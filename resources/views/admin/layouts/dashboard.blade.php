@@ -4,10 +4,10 @@
 <div class="card w-100" style="height: 100vh;">
     <div class="card-header pb-0">
         <div class="row">
-            <div class="col-8  offset-2">
+            <div class="col-8 offset-2">
                 <h5 class="text-center">Panel de Administración</h5>
             </div>
-            <div class="col-2">
+            <div class="col-2 align-items-end">
                 <form method="POST" action="{{ route('admin_logout') }}" class="mb-1">
                     @csrf
                     <button type="submit" class="btn btn-danger btn-sm">
