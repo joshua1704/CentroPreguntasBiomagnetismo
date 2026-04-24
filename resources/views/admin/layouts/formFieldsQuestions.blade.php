@@ -1,5 +1,5 @@
 <div class="row">
-    <div class="col-12 col-md-6 col-lg-3 mb-3 mb-lg-0">
+    <div class="col-12 col-md-6 col-lg-3 mb-1 mb-lg-0">
         <div class="d-flex d-lg-block align-items-center gap-2">
             <select class="form-select form-select-sm" id="inputSelectTopics" name="topic">
                 <option value="">Todos los temas</option>
@@ -9,7 +9,7 @@
             </select>
         </div>
     </div>
-    <div class="col-12 col-md-6 col-lg-4 mb-3 mb-3 mb-lg-0">
+    <div class="col-12 col-md-6 col-lg-4 mb-1 mb-lg-0">
         <div class="d-flex d-lg-block align-items-center gap-2">
             <select class="form-select form-select-sm {{ ($search_params['date'] ?? '') == 'custome_range' ? 'd-none' : '' }}" id="inputSelectDate" name="date">
                 <option value="">Todas las fechas</option>
@@ -27,12 +27,12 @@
 
         </div>
     </div>
-    <div class="col-8 col-md-6 col-lg-3 mb-3 mb-lg-0">
+    <div class="col-8 col-md-6 col-lg-3 mb-1 mb-lg-0">
         <div class="d-flex d-lg-block align-items-center gap-2">
             <input class="form-control form-control-sm" type="search" placeholder="Texto a buscar" name="search" value="{{ $search_params['search'] ?? '' }}">
         </div>
     </div>
-    <div class="col-4 offset-md-0 col-md-6 offset-lg-0 col-lg-2 mb-3 mb-lg-0 align-content-end">
+    <div class="col-4 offset-md-0 col-md-6 offset-lg-0 col-lg-2 mb-1 mb-lg-0 align-content-end">
         <button class="btn btn-primary btn-sm w-100" id="btnSearchParamsSubmit">Buscar</button>
         <button type="button" class="btn btn-primary btn-sm w-100 d-none" id="btnSearchParamsSpinner" disabled>
             <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
