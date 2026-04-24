@@ -18,5 +18,7 @@ return [
     'error_not_find_register' => 'Record not found.',
     'success_updated' => 'Updated successfully.',
     'error_update_question' => 'An unexpected error occurred while trying to update the question.',
-    'password_min' => 'The password must be at least 8 characters long.'
+    'password_min' => 'The password must be at least 8 characters long.',
+    'login_not_attempt' => '',
+    'login_not_access' => ''
 ];

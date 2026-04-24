@@ -19,6 +19,12 @@ class AuthController extends Controller
         ]);
 
         if(Auth::attempt($credentials)) {
+            if (auth()->user()->is_admin) {
+                return back()->withErrors([
+                    'login' => __('validator.login_not_access'),
+                ]);
+            }
+
             $request->session()->regenerate();
 
             if(auth()->user()->must_change_password) {
@@ -29,7 +35,7 @@ class AuthController extends Controller
         }
 
         return back()->withErrors([
-            'login' => 'Credenciales incorrectas',
+            'login' => __('validator.login_not_attempt'),
         ]);
     }
 

@@ -18,5 +18,7 @@ return [
     'error_not_find_register' => 'Registro no encontrado.',
     'success_updated' => 'Actualizado correctamente.',
     'error_update_question' => 'Hubo un error inesperado al intentar actualizar la pregunta',
-    'password_min' => 'La contraseña debe tener al menos 8 caracteres.'
+    'password_min' => 'La contraseña debe tener al menos 8 caracteres.',
+    'login_not_attempt' => 'Credenciales incorrectas.',
+    'login_not_access' => 'Usuario sin acceso.'
 ];
