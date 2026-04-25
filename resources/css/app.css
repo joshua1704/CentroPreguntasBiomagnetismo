@@ -171,7 +171,7 @@ thead.sticky-top {
     .w-sm-75    { width:  75% !important; }
     .w-sm-50    { width:  50% !important; }
     .w-sm-25    { width:  25% !important; }
-    .height_calc { height: calc(100vh - 190px); }
+    .height_calc { height: calc(100vh - 200px); }
 }
 
 /* =========================
@@ -185,7 +185,7 @@ thead.sticky-top {
     .w-md-75    { width:  75% !important; }
     .w-md-50    { width:  50% !important; }
     .w-md-25    { width:  25% !important; }
-    .height_calc { height: calc(100vh - 165px); }
+    .height_calc { height: calc(100vh - 170px); }
 
 }
 
